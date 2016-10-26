@@ -1,0 +1,853 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<helpItems schema="maml">
+
+<command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+<command:details><command:name>New-SMBAzureDeployment</command:name>
+<command:verb>New</command:verb>
+<command:noun>SMBAzureDeployment</command:noun>
+<maml:description><maml:para>This command serves as a public interface for the Azure part of the SMB solution. It uses a set of given deployment parameters to start and monitor the ARM-based deployment in Azure.
+</maml:para>
+</maml:description>
+</command:details>
+<maml:description><maml:para>This command can be used to deploy the Small &amp; Medium Business ARM template towards a managed CSP customer. Based on given parameters, the following steps are executed:
+</maml:para>
+<maml:para>1. Connect to the target tenant's subscription 2. Verify that the naming convention is available foruse with the public DNS label and Azure resource group 3. The resource group is created based on a prefix and the customer-name 4. Initiates a new ARM-based deployment with a generated parameter-set to provision the chosen resources 5. While the deployment is occuring, the status is polled every 10 seconds and updated in the job-variable/progress 6. When the deployment is done, all connection and other deployment information is returned
+</maml:para>
+</maml:description>
+<command:syntax><command:syntaxItem><maml:name>New-SMBAzureDeployment</maml:name>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>AdditionalSQLInstanceSize</maml:name>
+<maml:Description><maml:para>Specifies the size of the Azure SQL instance to deploy. 'None' can be used to disable the deployment of this resource.
+</maml:para>
+</maml:Description>
+<command:parameterValueGroup><command:parameterValue required="false" variableLength="false">none</command:parameterValue>
+<command:parameterValue required="false" variableLength="false">small</command:parameterValue>
+</command:parameterValueGroup>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>AdditionalVMSize</maml:name>
+<maml:Description><maml:para>Specifies the size of the additional Azure VM to deploy. 'None' can be used to disable the deployment of this resource.
+</maml:para>
+</maml:Description>
+<command:parameterValueGroup><command:parameterValue required="false" variableLength="false">none</command:parameterValue>
+<command:parameterValue required="false" variableLength="false">small</command:parameterValue>
+<command:parameterValue required="false" variableLength="false">medium</command:parameterValue>
+</command:parameterValueGroup>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>AsJob</maml:name>
+<maml:Description><maml:para>If you want to run the deployment as a background job, this switch can be specified. A job-variable will be returned which can be monitored for deployment progress.
+</maml:para>
+</maml:Description>
+<dev:type><maml:name>SwitchParameter</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>False</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>Backup</maml:name>
+<maml:Description><maml:para>Specifies the size of the backup vault to deploy. 'None' can be used to disable the deployment of this resource.
+</maml:para>
+</maml:Description>
+<command:parameterValueGroup><command:parameterValue required="false" variableLength="false">none</command:parameterValue>
+<command:parameterValue required="false" variableLength="false">standard</command:parameterValue>
+</command:parameterValueGroup>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>Credential</maml:name>
+<maml:Description><maml:para>The CSP Administrator credentials to use. If this parameter is omitted, you wil be prompted to enter credentials.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">PSCredential</command:parameterValue>
+<dev:type><maml:name>PSCredential</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>CustomerName</maml:name>
+<maml:Description><maml:para>The name of the customer. This parameter is used to generate the resource group and public DNS names. Non-alphanumeric characters are stripped automatically. If the resulting resource-group or DNS label already exists, an error is generated and the deployment is aborted.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>CustomerSize</maml:name>
+<maml:Description><maml:para>The sizing of the customer. This determines the amount of subnets and the size of the essentials VM.
+</maml:para>
+</maml:Description>
+<command:parameterValueGroup><command:parameterValue required="false" variableLength="false">small</command:parameterValue>
+<command:parameterValue required="false" variableLength="false">medium</command:parameterValue>
+<command:parameterValue required="false" variableLength="false">large</command:parameterValue>
+</command:parameterValueGroup>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>Log</maml:name>
+<maml:Description><maml:para>This parameter is for internal use. To prevent a new logfile from being created when running in GUI-mode, the existing log-file to use is passed.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>ResourceGroupPrefix</maml:name>
+<maml:Description><maml:para>The naming prefix to use for the Azure resource group to be created.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>SubscriptionId</maml:name>
+<maml:Description><maml:para>The GUID of the tenant subscription to use. If this parameter is omitted, the default subscription will be used. Do not use in conjunction with the SubscriptionName parameter!
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>SubscriptionName</maml:name>
+<maml:Description><maml:para>The name of the tenant subscription to use. If this parameter is omitted, the default subscription will be used. Do not use in conjunction with the SubscriptionId parameter!
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>SysAdminPassword</maml:name>
+<maml:Description><maml:para>The password to use for the sysadmin account. The password must adhere to the Azure IaaS password requirements. If this parameter is omitted, a random password is used. The password can be consulted in the GUI and return value of this function itself.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>TenantDomain</maml:name>
+<maml:Description><maml:para>The name of the Tenant Domain as it is displayed in the CSP portal (not to be confused with the tenant's own default domain). This is used to select the target tenant for the deployment. Do not use in conjunction with the TenantId parameter!
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>VPN</maml:name>
+<maml:Description><maml:para>Specifies whether to deploy a basic VPN gateway or not. 'None' can be used to disable the deployment of this resource.
+</maml:para>
+</maml:Description>
+<command:parameterValueGroup><command:parameterValue required="false" variableLength="false">none</command:parameterValue>
+<command:parameterValue required="false" variableLength="false">basic</command:parameterValue>
+</command:parameterValueGroup>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+</command:syntaxItem>
+<command:syntaxItem><maml:name>New-SMBAzureDeployment</maml:name>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>AdditionalSQLInstanceSize</maml:name>
+<maml:Description><maml:para>Specifies the size of the Azure SQL instance to deploy. 'None' can be used to disable the deployment of this resource.
+</maml:para>
+</maml:Description>
+<command:parameterValueGroup><command:parameterValue required="false" variableLength="false">none</command:parameterValue>
+<command:parameterValue required="false" variableLength="false">small</command:parameterValue>
+</command:parameterValueGroup>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>AdditionalVMSize</maml:name>
+<maml:Description><maml:para>Specifies the size of the additional Azure VM to deploy. 'None' can be used to disable the deployment of this resource.
+</maml:para>
+</maml:Description>
+<command:parameterValueGroup><command:parameterValue required="false" variableLength="false">none</command:parameterValue>
+<command:parameterValue required="false" variableLength="false">small</command:parameterValue>
+<command:parameterValue required="false" variableLength="false">medium</command:parameterValue>
+</command:parameterValueGroup>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>AsJob</maml:name>
+<maml:Description><maml:para>If you want to run the deployment as a background job, this switch can be specified. A job-variable will be returned which can be monitored for deployment progress.
+</maml:para>
+</maml:Description>
+<dev:type><maml:name>SwitchParameter</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>False</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>Backup</maml:name>
+<maml:Description><maml:para>Specifies the size of the backup vault to deploy. 'None' can be used to disable the deployment of this resource.
+</maml:para>
+</maml:Description>
+<command:parameterValueGroup><command:parameterValue required="false" variableLength="false">none</command:parameterValue>
+<command:parameterValue required="false" variableLength="false">standard</command:parameterValue>
+</command:parameterValueGroup>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>Credential</maml:name>
+<maml:Description><maml:para>The CSP Administrator credentials to use. If this parameter is omitted, you wil be prompted to enter credentials.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">PSCredential</command:parameterValue>
+<dev:type><maml:name>PSCredential</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>CustomerName</maml:name>
+<maml:Description><maml:para>The name of the customer. This parameter is used to generate the resource group and public DNS names. Non-alphanumeric characters are stripped automatically. If the resulting resource-group or DNS label already exists, an error is generated and the deployment is aborted.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>CustomerSize</maml:name>
+<maml:Description><maml:para>The sizing of the customer. This determines the amount of subnets and the size of the essentials VM.
+</maml:para>
+</maml:Description>
+<command:parameterValueGroup><command:parameterValue required="false" variableLength="false">small</command:parameterValue>
+<command:parameterValue required="false" variableLength="false">medium</command:parameterValue>
+<command:parameterValue required="false" variableLength="false">large</command:parameterValue>
+</command:parameterValueGroup>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>Log</maml:name>
+<maml:Description><maml:para>This parameter is for internal use. To prevent a new logfile from being created when running in GUI-mode, the existing log-file to use is passed.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>ResourceGroupPrefix</maml:name>
+<maml:Description><maml:para>The naming prefix to use for the Azure resource group to be created.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>SubscriptionId</maml:name>
+<maml:Description><maml:para>The GUID of the tenant subscription to use. If this parameter is omitted, the default subscription will be used. Do not use in conjunction with the SubscriptionName parameter!
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>SubscriptionName</maml:name>
+<maml:Description><maml:para>The name of the tenant subscription to use. If this parameter is omitted, the default subscription will be used. Do not use in conjunction with the SubscriptionId parameter!
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>SysAdminPassword</maml:name>
+<maml:Description><maml:para>The password to use for the sysadmin account. The password must adhere to the Azure IaaS password requirements. If this parameter is omitted, a random password is used. The password can be consulted in the GUI and return value of this function itself.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>TenantId</maml:name>
+<maml:Description><maml:para>The id of the Tenant. This is used to select the target tenant for the deployment. Do not use in conjunction with the TenantDomain parameter!
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>VPN</maml:name>
+<maml:Description><maml:para>Specifies whether to deploy a basic VPN gateway or not. 'None' can be used to disable the deployment of this resource.
+</maml:para>
+</maml:Description>
+<command:parameterValueGroup><command:parameterValue required="false" variableLength="false">none</command:parameterValue>
+<command:parameterValue required="false" variableLength="false">basic</command:parameterValue>
+</command:parameterValueGroup>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+</command:syntaxItem>
+</command:syntax>
+<command:parameters><command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>AdditionalSQLInstanceSize</maml:name>
+<maml:Description><maml:para>Specifies the size of the Azure SQL instance to deploy. 'None' can be used to disable the deployment of this resource.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>AdditionalVMSize</maml:name>
+<maml:Description><maml:para>Specifies the size of the additional Azure VM to deploy. 'None' can be used to disable the deployment of this resource.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>AsJob</maml:name>
+<maml:Description><maml:para>If you want to run the deployment as a background job, this switch can be specified. A job-variable will be returned which can be monitored for deployment progress.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+<dev:type><maml:name>SwitchParameter</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>False</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>Backup</maml:name>
+<maml:Description><maml:para>Specifies the size of the backup vault to deploy. 'None' can be used to disable the deployment of this resource.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>Credential</maml:name>
+<maml:Description><maml:para>The CSP Administrator credentials to use. If this parameter is omitted, you wil be prompted to enter credentials.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">PSCredential</command:parameterValue>
+<dev:type><maml:name>PSCredential</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>CustomerName</maml:name>
+<maml:Description><maml:para>The name of the customer. This parameter is used to generate the resource group and public DNS names. Non-alphanumeric characters are stripped automatically. If the resulting resource-group or DNS label already exists, an error is generated and the deployment is aborted.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>CustomerSize</maml:name>
+<maml:Description><maml:para>The sizing of the customer. This determines the amount of subnets and the size of the essentials VM.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>Log</maml:name>
+<maml:Description><maml:para>This parameter is for internal use. To prevent a new logfile from being created when running in GUI-mode, the existing log-file to use is passed.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>ResourceGroupPrefix</maml:name>
+<maml:Description><maml:para>The naming prefix to use for the Azure resource group to be created.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>SubscriptionId</maml:name>
+<maml:Description><maml:para>The GUID of the tenant subscription to use. If this parameter is omitted, the default subscription will be used. Do not use in conjunction with the SubscriptionName parameter!
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>SubscriptionName</maml:name>
+<maml:Description><maml:para>The name of the tenant subscription to use. If this parameter is omitted, the default subscription will be used. Do not use in conjunction with the SubscriptionId parameter!
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>SysAdminPassword</maml:name>
+<maml:Description><maml:para>The password to use for the sysadmin account. The password must adhere to the Azure IaaS password requirements. If this parameter is omitted, a random password is used. The password can be consulted in the GUI and return value of this function itself.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>TenantDomain</maml:name>
+<maml:Description><maml:para>The name of the Tenant Domain as it is displayed in the CSP portal (not to be confused with the tenant's own default domain). This is used to select the target tenant for the deployment. Do not use in conjunction with the TenantId parameter!
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>TenantId</maml:name>
+<maml:Description><maml:para>The id of the Tenant. This is used to select the target tenant for the deployment. Do not use in conjunction with the TenantDomain parameter!
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>VPN</maml:name>
+<maml:Description><maml:para>Specifies whether to deploy a basic VPN gateway or not. 'None' can be used to disable the deployment of this resource.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+</command:parameters>
+<command:inputTypes><command:inputType><dev:type><maml:name>None</maml:name>
+</dev:type>
+<maml:description><maml:para>
+</maml:para>
+</maml:description>
+</command:inputType>
+</command:inputTypes>
+<command:returnValues><command:returnValue><dev:type><maml:name>System.Object</maml:name>
+</dev:type>
+<maml:description><maml:para>This function returns a job-variable with the folowing contents: * Type (the deployment-type. This will be 'Azure' for deployments started with this function)
+</maml:para>
+<maml:para>* Duration (the duration of the deployment)
+</maml:para>
+<maml:para>* Status (Provides status-information for the deployment)
+</maml:para>
+<maml:para>    * Configuration (contains several outputs of the deployment)         * Domain (the domain of the solution)         * Login (the username of the default admin account)         *  Password (the password for the default admin account)         * ResourceGroup (the name of the Azure resource group used for the deployment)         * Connection (the url to the RDWeb endpoint for remote access) * Completed (equals 'TRUE' if the deployment is done)
+</maml:para>
+<maml:para>* Error (if an exception occured during the deployment, it will be stored here)
+</maml:para>
+<maml:para>* Log (the full location of the logfile for the deployment)
+</maml:para>
+</maml:description>
+</command:returnValue>
+</command:returnValues>
+<maml:alertSet><maml:alert><maml:para>
+</maml:para>
+</maml:alert>
+</maml:alertSet>
+<command:examples><command:example><maml:title>Example 1</maml:title>
+<dev:code>PS C:\&gt; New-SMBAzureDeployment -AdditionalSQLInstanceSize small -AdditionalVMSize medium -TenantDomain Contoso.com -CustomerName Contoso -CustomerSize small -SysAdminPassword MySecretP@ssword1234 -Backup standard -Credential $MyCredential -SubscriptionId 3812cde5-cb5e-42de-a673-20228eed897f -VPN basic</dev:code>
+<dev:remarks><maml:para>This example will deploy a small SMB scenario to the Contoso.com CSP tenant with the following resources: * 1 Essentials VM (small size)
+</maml:para>
+<maml:para>* 1 Additional VM (medium size)
+</maml:para>
+<maml:para>* 1 Additional Azure SQL instance (small size)
+</maml:para>
+<maml:para>* 1 basic VPN gateway
+</maml:para>
+<maml:para>* Backup of the essential and additional machines
+</maml:para>
+</dev:remarks>
+</command:example>
+</command:examples>
+<command:relatedLinks><maml:navigationLink><maml:linkText>https://inovativ.github.io/SMBblueprint-Docs/</maml:linkText>
+<maml:uri>https://inovativ.github.io/SMBblueprint-Docs/</maml:uri>
+</maml:navigationLink>
+</command:relatedLinks>
+</command:command>
+<command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+<command:details><command:name>New-SMBOfficeDeployment</command:name>
+<command:verb>New</command:verb>
+<command:noun>SMBOfficeDeployment</command:noun>
+<maml:description><maml:para>This command serves as a public interface for the O365 part of the SMB solution. It uses a set of given deployment parameters to start and monitor the user/group-deployment in O365.
+</maml:para>
+</maml:description>
+</command:details>
+<maml:description><maml:para>This command will use a given CSV file and Tenant Information to orchestrate the provisioning of O365 users and groups. The following steps are executed: 1. Create a local admin account in the O365 subscription of the tenant to bypass some CSP restrictions regarding Groups/Onedrive provisioning 1. Parse the CSV information and alert on licensing issues 2. Create the specified users in the tenant's Azure AD, and assign the appropriate licenses 3. Create the specified Office Groups in Exchange Online (part of O365), using the local admin account 4. Populate user/group owner/membership, using the local admin account 5. Pre-provision all user's Onedrives, using the local admin account in combination with Sharepoint Online 6. Output all provisioning info
+</maml:para>
+</maml:description>
+<command:syntax><command:syntaxItem><maml:name>New-SMBOfficeDeployment</maml:name>
+<command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>Credential</maml:name>
+<maml:Description><maml:para>The CSP Partner credential to use for the deployment
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">PSCredential</command:parameterValue>
+<dev:type><maml:name>PSCredential</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>CSV</maml:name>
+<maml:Description><maml:para>The location of the CSV file that contains the O365 inventory. The following information must be present in this file: * First (the first-name of the user)
+</maml:para>
+<maml:para>* Last (the last-name of the user)
+</maml:para>
+<maml:para>* Title (the user's title or function)
+</maml:para>
+<maml:para>* DisplayName (currently not in use)
+</maml:para>
+<maml:para>* Department (the user's department)
+</maml:para>
+<maml:para>* Office (the user's office location)
+</maml:para>
+<maml:para>* Mobile (the user's mobile phone number)
+</maml:para>
+<maml:para>* Country (the user's country, expressed as an ISO-code (https://www.iso.org/obp/ui/#search))* Groups (the group to which the user should belong)     * If the group is mentioned for the first time, the associated user will be set as owner. Subsequent users that have the same group specified will be a regular member.     * The created groups will be private Office Groups * License (the license to assign to the user, expressed as the SKU code, which can be found using get-msolaccountsku -TenantId &lt;ID of your CSP tenant&gt;)     * You can get the tenant-id's under your CSP account by connecting to your root Azure AD with 'Connect-MSOLService' and then querying the tenants with 'Get-MSOLPartnerContract -All|select DefaultDomainName,TenantId'
+</maml:para>
+<maml:para>&gt; Example CSV: 
+First,Last,Title,DisplayName,Department,Office,Mobile,Country,Groups,License
+Jan,Van Meirvenne,Consultant,Jan.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGroup1,O365_BUSINESS_PREMIUM
+Jin,Van Meirvenne,Consultant,Jin.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGroup10,O365_BUSINESS_PREMIUM
+Jon,Van Meirvenne,Consultant,Jon.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGroup10,O365_BUSINESS_PREMIUM
+
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>DefaultPassword</maml:name>
+<maml:Description><maml:para>The initial password to use for the users to provision. The password must adhere to the Azure AD password policy (https://azure.microsoft.com/en-us/documentation/articles/active-directory-passwords-policy/). If this parameter is omitted, a random password is generated. The password can be consulted from the function's job output.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>Log</maml:name>
+<maml:Description><maml:para>This parameter is for internal use. To prevent a new logfile from being created when running in GUI-mode, the existing log-file to use is passed.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>MailDomain</maml:name>
+<maml:Description><maml:para>The mail-suffix to use for the provisioned users. This domain must be a validated domain in the tenant. If this parameter is omitted, the default tenant domain is used.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>SyncHash</maml:name>
+<maml:Description><maml:para>Internal parameter that provides integration with the GUI. Has no functional value and hence should not be used.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">Object</command:parameterValue>
+<dev:type><maml:name>Object</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>TenantDomain</maml:name>
+<maml:Description><maml:para>The name of the Tenant Domain as it is displayed in the CSP portal (not to be confused with the tenant's own default domain). This is used to select the target tenant for the deployment. Do not use in conjunction with the TenantId parameter!
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+</command:syntaxItem>
+<command:syntaxItem><maml:name>New-SMBOfficeDeployment</maml:name>
+<command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>Credential</maml:name>
+<maml:Description><maml:para>The CSP Partner credential to use for the deployment
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">PSCredential</command:parameterValue>
+<dev:type><maml:name>PSCredential</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>CSV</maml:name>
+<maml:Description><maml:para>The location of the CSV file that contains the O365 inventory. The following information must be present in this file: * First (the first-name of the user)
+</maml:para>
+<maml:para>* Last (the last-name of the user)
+</maml:para>
+<maml:para>* Title (the user's title or function)
+</maml:para>
+<maml:para>* DisplayName (currently not in use)
+</maml:para>
+<maml:para>* Department (the user's department)
+</maml:para>
+<maml:para>* Office (the user's office location)
+</maml:para>
+<maml:para>* Mobile (the user's mobile phone number)
+</maml:para>
+<maml:para>* Country (the user's country, expressed as an ISO-code (https://www.iso.org/obp/ui/#search))* Groups (the group to which the user should belong)     * If the group is mentioned for the first time, the associated user will be set as owner. Subsequent users that have the same group specified will be a regular member.     * The created groups will be private Office Groups * License (the license to assign to the user, expressed as the SKU code, which can be found using get-msolaccountsku -TenantId &lt;ID of your CSP tenant&gt;)     * You can get the tenant-id's under your CSP account by connecting to your root Azure AD with 'Connect-MSOLService' and then querying the tenants with 'Get-MSOLPartnerContract -All|select DefaultDomainName,TenantId'
+</maml:para>
+<maml:para>&gt; Example CSV: 
+First,Last,Title,DisplayName,Department,Office,Mobile,Country,Groups,License
+Jan,Van Meirvenne,Consultant,Jan.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGroup1,O365_BUSINESS_PREMIUM
+Jin,Van Meirvenne,Consultant,Jin.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGroup10,O365_BUSINESS_PREMIUM
+Jon,Van Meirvenne,Consultant,Jon.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGroup10,O365_BUSINESS_PREMIUM
+
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>DefaultPassword</maml:name>
+<maml:Description><maml:para>The initial password to use for the users to provision. The password must adhere to the Azure AD password policy (https://azure.microsoft.com/en-us/documentation/articles/active-directory-passwords-policy/). If this parameter is omitted, a random password is generated. The password can be consulted from the function's job output.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>Log</maml:name>
+<maml:Description><maml:para>This parameter is for internal use. To prevent a new logfile from being created when running in GUI-mode, the existing log-file to use is passed.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>MailDomain</maml:name>
+<maml:Description><maml:para>The mail-suffix to use for the provisioned users. This domain must be a validated domain in the tenant. If this parameter is omitted, the default tenant domain is used.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>SyncHash</maml:name>
+<maml:Description><maml:para>Internal parameter that provides integration with the GUI. Has no functional value and hence should not be used.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">Object</command:parameterValue>
+<dev:type><maml:name>Object</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>TenantId</maml:name>
+<maml:Description><maml:para>The id of the Tenant. This is used to select the target tenant for the deployment. Do not use in conjunction with the TenantDomain parameter!
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+</command:syntaxItem>
+</command:syntax>
+<command:parameters><command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>Credential</maml:name>
+<maml:Description><maml:para>The CSP Partner credential to use for the deployment
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">PSCredential</command:parameterValue>
+<dev:type><maml:name>PSCredential</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>CSV</maml:name>
+<maml:Description><maml:para>The location of the CSV file that contains the O365 inventory. The following information must be present in this file: * First (the first-name of the user)
+</maml:para>
+<maml:para>* Last (the last-name of the user)
+</maml:para>
+<maml:para>* Title (the user's title or function)
+</maml:para>
+<maml:para>* DisplayName (currently not in use)
+</maml:para>
+<maml:para>* Department (the user's department)
+</maml:para>
+<maml:para>* Office (the user's office location)
+</maml:para>
+<maml:para>* Mobile (the user's mobile phone number)
+</maml:para>
+<maml:para>* Country (the user's country, expressed as an ISO-code (https://www.iso.org/obp/ui/#search))* Groups (the group to which the user should belong)     * If the group is mentioned for the first time, the associated user will be set as owner. Subsequent users that have the same group specified will be a regular member.     * The created groups will be private Office Groups * License (the license to assign to the user, expressed as the SKU code, which can be found using get-msolaccountsku -TenantId &lt;ID of your CSP tenant&gt;)     * You can get the tenant-id's under your CSP account by connecting to your root Azure AD with 'Connect-MSOLService' and then querying the tenants with 'Get-MSOLPartnerContract -All|select DefaultDomainName,TenantId'
+</maml:para>
+<maml:para>&gt; Example CSV: 
+First,Last,Title,DisplayName,Department,Office,Mobile,Country,Groups,License
+Jan,Van Meirvenne,Consultant,Jan.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGroup1,O365_BUSINESS_PREMIUM
+Jin,Van Meirvenne,Consultant,Jin.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGroup10,O365_BUSINESS_PREMIUM
+Jon,Van Meirvenne,Consultant,Jon.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGroup10,O365_BUSINESS_PREMIUM
+
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>DefaultPassword</maml:name>
+<maml:Description><maml:para>The initial password to use for the users to provision. The password must adhere to the Azure AD password policy (https://azure.microsoft.com/en-us/documentation/articles/active-directory-passwords-policy/). If this parameter is omitted, a random password is generated. The password can be consulted from the function's job output.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>Log</maml:name>
+<maml:Description><maml:para>This parameter is for internal use. To prevent a new logfile from being created when running in GUI-mode, the existing log-file to use is passed.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>MailDomain</maml:name>
+<maml:Description><maml:para>The mail-suffix to use for the provisioned users. This domain must be a validated domain in the tenant. If this parameter is omitted, the default tenant domain is used.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>SyncHash</maml:name>
+<maml:Description><maml:para>Internal parameter that provides integration with the GUI. Has no functional value and hence should not be used.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">Object</command:parameterValue>
+<dev:type><maml:name>Object</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>TenantDomain</maml:name>
+<maml:Description><maml:para>The name of the Tenant Domain as it is displayed in the CSP portal (not to be confused with the tenant's own default domain). This is used to select the target tenant for the deployment. Do not use in conjunction with the TenantId parameter!
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>TenantId</maml:name>
+<maml:Description><maml:para>The id of the Tenant. This is used to select the target tenant for the deployment. Do not use in conjunction with the TenantDomain parameter!
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+</command:parameters>
+<command:inputTypes><command:inputType><dev:type><maml:name>None</maml:name>
+</dev:type>
+<maml:description><maml:para>
+</maml:para>
+</maml:description>
+</command:inputType>
+</command:inputTypes>
+<command:returnValues><command:returnValue><dev:type><maml:name>System.Management.Automation.PSObject</maml:name>
+</dev:type>
+<maml:description><maml:para>This function returns a job-variable with the folowing contents: * Type (the deployment-type. This will be 'Office' for deployments started with this function)
+</maml:para>
+<maml:para>* Duration (the duration of the deployment)
+</maml:para>
+<maml:para>* Status (Provides status-information for the deployment)
+</maml:para>
+<maml:para>    * Configuration (contains several outputs of the deployment)         * ProvisionedUsers (a list of all provisioned users including login-information)         * ProvisionedGroups (a list of all provisioned office groups) * Completed (equals 'TRUE' if the deployment is done)
+</maml:para>
+<maml:para>* Error (if an exception occured during the deployment, it will be stored here)
+</maml:para>
+<maml:para>* Log (the full location of the logfile for the deployment)
+</maml:para>
+</maml:description>
+</command:returnValue>
+</command:returnValues>
+<maml:alertSet><maml:alert><maml:para>
+</maml:para>
+</maml:alert>
+</maml:alertSet>
+<command:examples><command:example><maml:title>Example 1</maml:title>
+<dev:code>PS C:\&gt; New-SMBOfficeDeployment -DefaultPassword MySecretPassword -Credential $MyCredential -MailDomain contoso.com -CSV C:\SMBUsers.csv -TenantId 95e2e584-5e01-4065-bcee-8203d1005a90</dev:code>
+<dev:remarks><maml:para>This example will use the information specified in the given CSV to provision a set of users and groups in the specified CSP tenant. The suffix '@Contoso.Com' will be used for the UPN of the users.
+</maml:para>
+</dev:remarks>
+</command:example>
+</command:examples>
+<command:relatedLinks><maml:navigationLink><maml:linkText>https://inovativ.github.io/SMBblueprint-Docs/</maml:linkText>
+<maml:uri>https://inovativ.github.io/SMBblueprint-Docs/</maml:uri>
+</maml:navigationLink>
+</command:relatedLinks>
+</command:command>
+<command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
+<command:details><command:name>Start-SMBDeploymentGUI</command:name>
+<command:verb>Start</command:verb>
+<command:noun>SMBDeploymentGUI</command:noun>
+<maml:description><maml:para>Launches a grpahical interface to provide a more guided experience when using the SMB Blueprint solution
+</maml:para>
+</maml:description>
+</command:details>
+<maml:description><maml:para>This command launches a GUI based on WPF XAML code, external PNG images (bundled with this module) and PS-based code-behind.
+</maml:para>
+</maml:description>
+<command:syntax><command:syntaxItem><maml:name>Start-SMBDeploymentGUI</maml:name>
+</command:syntaxItem>
+</command:syntax>
+<command:parameters></command:parameters>
+<command:inputTypes><command:inputType><dev:type><maml:name>None</maml:name>
+</dev:type>
+<maml:description><maml:para>
+</maml:para>
+</maml:description>
+</command:inputType>
+</command:inputTypes>
+<command:returnValues><command:returnValue><dev:type><maml:name>System.Object</maml:name>
+</dev:type>
+<maml:description><maml:para>
+</maml:para>
+</maml:description>
+</command:returnValue>
+</command:returnValues>
+<maml:alertSet><maml:alert><maml:para>
+</maml:para>
+</maml:alert>
+</maml:alertSet>
+<command:examples><command:example><maml:title>Example 1</maml:title>
+<dev:code>PS C:\&gt; Start-SMBDeploymentGUI</dev:code>
+<dev:remarks><maml:para>Launches the graphical user interface of the SMB solution
+</maml:para>
+</dev:remarks>
+</command:example>
+</command:examples>
+<command:relatedLinks><maml:navigationLink><maml:linkText>https://inovativ.github.io/SMBblueprint-Docs/</maml:linkText>
+<maml:uri>https://inovativ.github.io/SMBblueprint-Docs/</maml:uri>
+</maml:navigationLink>
+</command:relatedLinks>
+</command:command>
+</helpItems>
