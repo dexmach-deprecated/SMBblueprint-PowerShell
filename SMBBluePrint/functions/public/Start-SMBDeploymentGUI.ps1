@@ -408,6 +408,14 @@ Function Start-SMBDeploymentGUI {
 					Invoke-Message -Message "The target resource group $($SyncHash.ViewModel.ResourceGroup) already exists, please modify the customer prefix"
 					return
 				}
+				if((Test-AzureRmDnsAvailability -DomainNameLabel $SyncHash.ViewModel.CustomerName.ToLower() -Location "westeurope") -eq $false){
+					write-log -type error -Message "The public DNS record for this customer name is already taken, please choose another customer name"
+					return
+				}
+				if($SyncHash.ViewModel.CustomerName -like "*microsoft*"){
+					invoke-message -message "'Microsoft' can not be a part of the customer name, please choose another customer name"
+					return
+				}
 				
 				$Overview = `
 				"The deployment will be started with the following parameters:`r`n" +`

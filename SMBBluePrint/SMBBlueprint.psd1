@@ -22,7 +22,8 @@
 @{ModuleName="Microsoft.Online.SharePoint.PowerShell";ModuleVersion="16.0.5806.0";Guid="adedde5f-e77b-4682-ab3d-a4cb4ff79b83"},
 @{ModuleName="AzureRM.Profile";ModuleVersion="1.0.11";Guid="342714fc-4009-4863-8afb-a9067e3db04b"},
 @{ModuleName="AzureRM.Resources";ModuleVersion="1.0.11";Guid="ab3ca893-26fe-44b0-bd3c-8933df144d7b"},
-@{ModuleName="MSOnline";ModuleVersion="1.0";Guid="d162594e-d7aa-42be-9884-84928d3f7acf"}
+@{ModuleName="MSOnline";ModuleVersion="1.0";Guid="d162594e-d7aa-42be-9884-84928d3f7acf"},
+@{ModuleName="AzureRM.Network";ModuleVersion="3.0.0";Guid="eb75c732-e274-4a20-b502-e9958e63484a"}
 )
 
     PrivateData = @{
@@ -45,7 +46,8 @@
         ReleaseNotes = @(
             '0.0.0.1: Initial preview, not production ready!',
             '0.0.0.3: Publishing test with VSO build automation. Logging capabilities optimized. Added -MailDomain switch to Office Deployment function.',
-            '0.0.0.4: Publishing test with VSO build automation. Logging capabilities optimized. Added -MailDomain switch to Office Deployment function.'
+            '0.0.0.4: Publishing test with VSO build automation. Logging capabilities optimized. Added -MailDomain switch to Office Deployment function.',
+            '0.0.0.5: Added missing AzureRM.Network requirement. Added additional checks for Azure Public DNS reserved keyword policy'
         )
         ExternalModuleDependencies = @('Microsoft.Online.SharePoint.PowerShell')
 

@@ -3,6 +3,7 @@
 #Requires -Module AzureRM.Resources
 #Requires -Module MSOnline
 #Requires -Module Microsoft.Online.SharePoint.PowerShell
+#Requires -Module AzureRM.Network
 [cmdletbinding()]
 param(
     [string]$LogName = "Execution.log"

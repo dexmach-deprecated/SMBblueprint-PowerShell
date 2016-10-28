@@ -106,6 +106,10 @@ function New-SMBAzureDeployment {
 			write-log -type error -Message "Domain Name already taken, please choose another customer name"
 			return
 		}
+		if($CustomerNamePrefix -like "*microsoft*"){
+			write-log -type error -message "'Microsoft' can not be a part of the customer name, please choose another customer name"
+			return
+		}
 
 		$AzureParameters = @{
 			customername = $CustomerNamePrefix
