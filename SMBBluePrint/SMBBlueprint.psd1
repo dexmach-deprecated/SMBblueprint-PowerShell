@@ -2,7 +2,7 @@
 
     RootModule = 'SMBBlueprint.psm1';
 
-    ModuleVersion = '0.0.0.5';
+    ModuleVersion = '0.0.0.6';
 
     GUID = '83bc0698-c6b4-486a-a8e5-5e585038928d';
 
@@ -12,7 +12,7 @@
 
     Copyright = '(c) 2016 Inovativ BE. All rights reserved.';
 
-    Description = 'Deployment Framework for the Microsoft SMB Azure & O365 solution. NOT READY FOR PRODUCTION!';
+    Description = 'Deployment Framework for the Microsoft SMB Azure & O365 solution.';
 
     PowerShellVersion = '3.0';
 
@@ -47,7 +47,8 @@
             '0.0.0.1: Initial preview, not production ready!',
             '0.0.0.3: Publishing test with VSO build automation. Logging capabilities optimized. Added -MailDomain switch to Office Deployment function.',
             '0.0.0.4: Publishing test with VSO build automation. Logging capabilities optimized. Added -MailDomain switch to Office Deployment function.',
-            '0.0.0.5: Added missing AzureRM.Network requirement. Added additional checks for Azure Public DNS reserved keyword policy'
+            '0.0.0.5: Added missing AzureRM.Network requirement. Added additional checks for Azure Public DNS reserved keyword policy',
+            '0.0.0.6: Fixed VM start/stop automation issues: Schedules are now enabled from the day after deployment / Variable<->Tag mismatch resolved / centralized the template URL in the ARM structure'
         )
         ExternalModuleDependencies = @('Microsoft.Online.SharePoint.PowerShell')
 

@@ -119,7 +119,8 @@ function New-SMBAzureDeployment {
 			backupEnabled = $Backup
 			vpnGateway = $VPN
 			scheduleid01=$([guid]::NewGuid().ToString())
-			scheduleid02=$([guid]::NewGuid().ToString())               
+			scheduleid02=$([guid]::NewGuid().ToString())
+            scheduleStartDate = (get-date).AddDays(1).ToString("yyyy/MM/dd")          
 		}
 		$AzureParameters.Add('adminPassword',$SecurePassword)
 		
