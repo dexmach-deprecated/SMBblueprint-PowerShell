@@ -10,7 +10,7 @@ param(
 )
 Set-StrictMode -Version Latest
 $script:ErrorActionPreference = "stop"
-New-Variable -Name Root -Scope Script -Value $PSScriptRoot
+New-Variable -Name Root -Scope Script -Value $PSScriptRoot -Force
 #New-Variable -Name Log -Scope Script -Force
 <#$script:DebugPreference = "continue"
 $script:InformationPreference = "continue"

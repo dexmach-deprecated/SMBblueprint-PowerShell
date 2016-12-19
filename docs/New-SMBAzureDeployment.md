@@ -14,18 +14,20 @@ It uses a set of given deployment parameters to start and monitor the ARM-based 
 
 ### AzureTenantDomain (Default)
 ```
-New-SMBAzureDeployment [-AsJob] -CustomerName <String> -CustomerSize <String> [-AdditionalVMSize <String>]
- [-AdditionalSQLInstanceSize <String>] [-Backup <String>] [-VPN <String>] [-SysAdminPassword <String>]
- -Credential <PSCredential> -TenantDomain <String> [-SubscriptionId <String>] [-SubscriptionName <String>]
- [-ResourceGroupPrefix <String>] [-Log <String>] [<CommonParameters>]
+New-SMBAzureDeployment -Location <String> [-FallbackLocation <String>] [-AsJob] -CustomerName <String>
+ -CustomerSize <String> [-AdditionalVMSize <String>] [-AdditionalSQLInstanceSize <String>] [-Backup <String>]
+ [-VPN <String>] [-Management <String>] [-OS <String>] [-SysAdminPassword <String>] -Credential <PSCredential>
+ -TenantDomain <String> [-SubscriptionId <String>] [-SubscriptionName <String>] [-ResourceGroupPrefix <String>]
+ [-Log <String>] [<CommonParameters>]
 ```
 
 ### AzureTenantId
 ```
-New-SMBAzureDeployment [-AsJob] -CustomerName <String> -CustomerSize <String> [-AdditionalVMSize <String>]
- [-AdditionalSQLInstanceSize <String>] [-Backup <String>] [-VPN <String>] [-SysAdminPassword <String>]
- -Credential <PSCredential> -TenantId <String> [-SubscriptionId <String>] [-SubscriptionName <String>]
- [-ResourceGroupPrefix <String>] [-Log <String>] [<CommonParameters>]
+New-SMBAzureDeployment -Location <String> [-FallbackLocation <String>] [-AsJob] -CustomerName <String>
+ -CustomerSize <String> [-AdditionalVMSize <String>] [-AdditionalSQLInstanceSize <String>] [-Backup <String>]
+ [-VPN <String>] [-Management <String>] [-OS <String>] [-SysAdminPassword <String>] -Credential <PSCredential>
+ -TenantId <String> [-SubscriptionId <String>] [-SubscriptionName <String>] [-ResourceGroupPrefix <String>]
+ [-Log <String>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -104,6 +106,7 @@ Accept wildcard characters: False
 
 ### -Backup
 Specifies the size of the backup vault to deploy. 'None' can be used to disable the deployment of this resource.
+If the selected Azure location does not support the backup resource, it will not be deployed regardless of this setting.
 
 ```yaml
 Type: String
@@ -287,6 +290,72 @@ Accepted values: none, basic
 Required: False
 Position: Named
 Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -FallbackLocation
+The location to use for the monitoring- and automation services in case the primary region does not support them.
+The supported fallback locations are:
+* westeurope
+* southeastasia
+* australiasoutheast
+
+When this parameter is omitted and the primary region is not supported, you will be prompted to choose one of the locations, or cancel the deployment.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases: 
+Accepted Values: westeurope, southeastasia, australiasoutheast
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Location
+The Azure location where the solution should be deployed. Some locations impose limits in regards to the backup, automation and monitoring capabilities. Check the 'Backup' and 'FallbackLocation' parameters for more information.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases: 
+
+Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -Management
+Controls whether the monitoring and automation resources are deployed. In the current version, this option is not usable and the resources are always deployed.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases: 
+
+Required: False
+Position: Named
+Default value: free
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -OS
+Determines the used operating system for the VM deployments. Currently '2012R2' and '2016' are the only supported parameters.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases: 
+Accepted Values: '2012R2','2016'
+Required: False
+Position: Named
+Default value: '2012R2'
 Accept pipeline input: False
 Accept wildcard characters: False
 ```

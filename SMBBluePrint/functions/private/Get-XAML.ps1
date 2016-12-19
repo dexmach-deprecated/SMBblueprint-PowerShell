@@ -11,7 +11,7 @@ function Get-XAML {
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         DataContext="{Binding ViewModel}"
-        Title="Microsoft Azure Small Business Server Solution Accelerator" Height="800" Width="1200" Background="White" WindowStyle="None">
+        Title="Microsoft Azure Small Business Server Solution Accelerator" Height="Auto" Width="Auto" SizeToContent="WidthAndHeight" Background="White" WindowStyle="None">
     <Window.Resources>
         <Style TargetType="{x:Type Button}">
             <Setter Property="HorizontalAlignment" Value="Left" />
@@ -128,7 +128,7 @@ function Get-XAML {
                 </Button>
             </StackPanel>
         </Grid>
-        <TabControl Name="Tab_MainControl" Grid.Row="2" Grid.Column="1" Height="650" BorderThickness="0">
+        <TabControl Name="Tab_MainControl" Grid.Row="2" Grid.Column="1" BorderThickness="0">
             <TabControl.ItemContainerStyle>
                 <Style x:Name="Style_HideTabs" TargetType="{x:Type TabItem}">
 
@@ -162,7 +162,7 @@ function Get-XAML {
                                 <TextBox Name="Txt_LogonUser" VerticalAlignment="Center" HorizontalAlignment="Left" Width="300" />
                                 <Label HorizontalAlignment="Left" VerticalAlignment="Center">Password:</Label>
                                 <PasswordBox Name="Txt_LogonPass" VerticalAlignment="Center" HorizontalAlignment="Left" Width="150"  />
-                                <Button Name="Btn_ConnectToAzure" VerticalAlignment="Center">Connect</Button>
+                                <Button Name="Btn_ConnectToAzure" VerticalAlignment="Center" IsDefault="True">Connect</Button>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <Label VerticalAlignment="Center" HorizontalAlignment="Left">Tenant:</Label>
@@ -377,39 +377,46 @@ function Get-XAML {
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="200" />
                                     <ColumnDefinition Width="100"/>
-                                   
+
                                 </Grid.ColumnDefinitions>
                                 <Grid.RowDefinitions>
                                     <RowDefinition />
                                     <RowDefinition />
                                     <RowDefinition />
                                     <RowDefinition />
+                                    <RowDefinition />
                                 </Grid.RowDefinitions>
 
+                                <Label Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2">OS:</Label>
+                                <ComboBox Grid.Column="2" Grid.Row="0" Name="Cmb_OS">
+                                    <ComboBoxItem Tag="2016" IsSelected="True">2016</ComboBoxItem>
+                                    <ComboBoxItem Tag="2012R2">2012R2</ComboBoxItem>
+                                </ComboBox>
 
-                                <Label Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2">Provision additional VM:</Label>
-                                <ComboBox Grid.Column="2" Grid.Row="0" Name="Cmb_ExtraVMSize">
+
+                                <Label Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2">Provision additional VM:</Label>
+                                <ComboBox Grid.Column="2" Grid.Row="1" Name="Cmb_ExtraVMSize">
                                     <ComboBoxItem Tag="none" IsSelected="True">No</ComboBoxItem>
                                     <ComboBoxItem Tag="small">Small</ComboBoxItem>
                                     <ComboBoxItem Tag="medium">Medium</ComboBoxItem>
                                 </ComboBox>
 
 
-                                <Label Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2">Provision SQL SaaS:</Label>
-                                <ComboBox Grid.Column="2" Grid.Row="1" Name="Cmb_ExtraSQLSize">
+                                <Label Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2">Provision SQL SaaS:</Label>
+                                <ComboBox Grid.Column="2" Grid.Row="2" Name="Cmb_ExtraSQLSize">
                                     <ComboBoxItem Tag="none" IsSelected="True">No</ComboBoxItem>
                                     <ComboBoxItem Tag="small">Yes</ComboBoxItem>
-                                   
+
                                 </ComboBox>
 
-                                <Label Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2">Provision Azure Backup Service:</Label>
-                                <ComboBox Grid.Column="2" Grid.Row="2" Name="Cmb_Backup">
+                                <Label Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2">Provision Azure Backup Service:</Label>
+                                <ComboBox Grid.Column="2" Grid.Row="3" Name="Cmb_Backup">
                                     <ComboBoxItem Tag="none" IsSelected="True">No</ComboBoxItem>
                                     <ComboBoxItem Tag="standard">Yes</ComboBoxItem>
 
                                 </ComboBox>
-                                <Label Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2">Provision VPN:</Label>
-                                <ComboBox Grid.Column="2" Grid.Row="3" Name="Cmb_VPN">
+                                <Label Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2">Provision VPN:</Label>
+                                <ComboBox Grid.Column="2" Grid.Row="4" Name="Cmb_VPN">
                                     <ComboBoxItem Tag="none" IsSelected="True">No</ComboBoxItem>
                                     <ComboBoxItem Tag="basic">Yes</ComboBoxItem>
 
@@ -419,8 +426,41 @@ function Get-XAML {
                             <CheckBox Name="Chk_AzureVM" Margin="150,50,0,0" Content="Deploy Extra VM"></CheckBox> -->
                             </Grid>
                         </GroupBox>
-                        <GroupBox Grid.Row="1" Header="4. Execute" >
+                        <GroupBox Grid.Row="1" Header="4. Location">
+                            <StackPanel HorizontalAlignment="Stretch">
+                                <Label VerticalAlignment="Center" HorizontalAlignment="Center">Location</Label>
+                                <ComboBox Name="Cmb_PrimaryLocation" Width="250" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                <StackPanel Name="Spl_ServiceUnavailable">
+                                    <Label VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="10,10,10,10" MinWidth="0" MaxWidth="300" >
+                                        <Label.Resources>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="TextWrapping" Value="Wrap" />
+                                            </Style>
+
+                                        </Label.Resources>
+                                        <Label.Background>
+                                            <SolidColorBrush Color="#FF0088FF" />
+                                        </Label.Background>
+                                        <Label.Foreground>
+                                            <SolidColorBrush Color="White" />
+                                        </Label.Foreground>
+                                        <TextBlock>WARNING: The monitoring, automation and recovery services are not available in this region.<LineBreak />
+                                    Please select a fallback action:</TextBlock>
+                                    </Label>
+                                    <ComboBox Name="Cmb_FallbackAction" Width="300" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                       <!-- <ComboBoxItem Tag="none" IsSelected="True">Continue deployment without these services</ComboBoxItem> -->
+                                        <ComboBoxItem Tag="westeurope" IsSelected="True">Deploy impacted services to West-Europe</ComboBoxItem>
+                                        <ComboBoxItem Tag="southeastasia">Deploy impacted services to SouthEast-Asia</ComboBoxItem>
+                                        <ComboBoxItem Tag="australiasoutheast">Deploy impacted services to Australia-SouthEast</ComboBoxItem>
+
+                                    </ComboBox>
+                                </StackPanel>
+                                
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox Grid.Row="1" Header="5. Execute" >
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                               
                                 <Label VerticalAlignment="Center">Customer Name</Label>
                                 <TextBox VerticalAlignment="Center" Name="Txt_Customer" Width="100" />
                                 <Button Name="btn_Deploy" VerticalAlignment="Center" HorizontalAlignment="Center" Height="30" Width="100" Background="#FF24BE43">Deploy Solution</Button>
@@ -480,14 +520,18 @@ function Get-XAML {
                                     </DataGrid.Columns>
                                 </DataGrid>
                                 <Grid HorizontalAlignment="Stretch">
-                                    <CheckBox Margin="0,0,5,0" Name="Chk_AutoScroll" IsChecked="True">Auto-Scroll</CheckBox>
-                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,5,0" Name="Txb_LogName">LogName</TextBlock>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <CheckBox Grid.Column="0" Margin="0,0,5,0" Name="Chk_AutoScroll" IsChecked="True">Auto-Scroll</CheckBox>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <TextBlock Visibility="Collapsed" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,5,0" Name="Txb_LogName">LogName</TextBlock>
                                         <Button Background="Transparent" Margin="0,0,0,0" BorderBrush="Transparent" VerticalAlignment="Center" Name="Btn_OpenLog">Open Log Location</Button>
                                     </StackPanel>
-                                    
+
                                 </Grid>
-                                
+
                             </StackPanel>
                         </GroupBox>
 

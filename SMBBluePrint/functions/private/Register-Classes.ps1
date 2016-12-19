@@ -67,6 +67,19 @@ public class Group : System.IEquatable<Group>
 
 }
 
+public class Country {
+	public string Name;
+	public string Code;
+
+	public override string ToString(){
+		return Name;
+	}
+}
+
+public class Region {
+
+}
+
 
 public class User : System.IEquatable<User>
 {
@@ -143,7 +156,7 @@ public class Tenant
 
 	public override string ToString()
 	{
-		return Name;
+		return Name + " (" + Id + ")";
 	}
 
 

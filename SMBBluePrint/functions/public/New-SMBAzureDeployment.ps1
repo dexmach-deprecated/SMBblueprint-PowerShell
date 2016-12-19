@@ -1,6 +1,13 @@
 function New-SMBAzureDeployment {
 	[cmdletbinding(DefaultParameterSetName="AzureTenantDomain")]
-	param(  
+	param(
+	[Parameter(Mandatory=$true)]
+	[ValidateNotNullOrEmpty()]
+	[string] $Location,
+	[Parameter()]
+	[ValidateNotNullOrEmpty()]
+	[ValidateSet('southeastasia','westeurope','australiasoutheast')]
+	[string] $FallbackLocation,
 	[parameter()]
 	[switch] $AsJob,
 	[parameter(Mandatory=$true)]
@@ -19,6 +26,13 @@ function New-SMBAzureDeployment {
 	[string] $Backup = 'none',
 	[ValidateSet('none','basic')]
 	[string] $VPN = 'none',
+	[parameter()]
+	[ValidateNotNullOrEmpty()]
+	[ValidateSet('free')]
+	[string] $Management = 'free',
+	[parameter()]
+	[ValidateSet('2012R2','2016')]
+	[string] $OS = '2012R2',
 	[parameter()]
 	[string] $SysAdminPassword = $(New-SWRandomPassword),
 	[parameter(Mandatory=$true)]
@@ -46,6 +60,8 @@ function New-SMBAzureDeployment {
 	)
 	
 	begin{
+		$Continue = $true
+		$Management = 'free'
 		if([string]::IsNullOrEmpty($Log) -eq $false){
 			if(test-path $Log){} else {
 				$Log = Start-Log
@@ -111,6 +127,72 @@ function New-SMBAzureDeployment {
 			return
 		}
 
+		$CompatibilityResults = Test-AzureResourceLocation -Location $Location -ResourceFile "$Root\resources"
+		$Break = $false
+		$Count = 0
+		if(((get-variable -name CompatibilityResults -ErrorAction Ignore) -eq $null) -or ($CompatibilityResults -eq $null)){
+			$Count = 0
+		} else {
+			$Count = $CompatibilityResults.Count
+		}
+		if($Count -gt 0){
+			$Continue = $false
+			foreach($Result in $CompatibilityResults){
+				switch -regex ($Result) {
+					
+					"microsoft\.(automation|operationalinsights|operationsmanagement)"{
+						
+						if(!$FallbackLocation){
+							if($Break){
+								break
+							}
+							$title = "Automation & Monitoring Features Unsupported for this Region"
+							$message = "The selected Azure Region does not support the automation & monitoring features of the SMB Blueprint solution. In which region should they be deployed instead (by re-running this command with the -FallBackLocation Parameter you can automatically deploy non-compatible resources to a fallback region)?" 
+							$choices = new-object System.Collections.ArrayList<System.Management.Automation.Host.ChoiceDescription>
+							$null = $choices.add($(New-Object System.Management.Automation.Host.ChoiceDescription "&Cancel","Aborts the deployment"))
+							$me = get-command -name new-smbazuredeployment
+							#$me.Parameters["FallbackLocation"].Attributes
+							foreach($ChoiceLocation in ((($me.Parameters["FallbackLocation"]).Attributes|?{$_.TypeId.Name -eq 'ValidateSetAttribute'})).ValidValues){
+								$null = $choices.Add($(New-Object System.Management.Automation.Host.ChoiceDescription "&$ChoiceLocation","Deploys the resources in '$ChoiceLocation'"))
+							}
+							$choices = $choices.ToArray([System.Management.Automation.Host.ChoiceDescription])
+						
+
+							
+
+							$result = $host.ui.PromptForChoice($title, $message, $choices, 0) 
+							write-log -message "You chose: $($choices[$result].Label.Replace('&',''))"
+							switch ($choices[$result].Label.Replace('&',''))
+							{
+								"Cancel" {write-log -message "Deployment Cancelled";$Continue = $false}
+								default {
+									
+									$FallbackLocation = ($choices[$result]).Label.Replace('&','')
+									write-log -message "Continuing Deployment with Fallback Location: $FallbackLocation"
+									$Continue = $true
+								}
+							}
+						} else {
+							$Continue = $true
+						}
+					
+					#	if($Continue){
+					#		$Backup = 'none';$Management = 'none'
+					#	}
+					$Break = $true
+					}
+					"microsoft.recoveryservices" {
+						write-log -type warning -message "Backup is not supported at this location. The feature will not be deployed"
+						$Backup = "none"
+					}
+					Default {}
+				}
+					
+				
+			}
+		} else {
+			# do nothing
+		}
 		$AzureParameters = @{
 			customername = $CustomerNamePrefix
 			customersize = $CustomerSize
@@ -120,7 +202,11 @@ function New-SMBAzureDeployment {
 			vpnGateway = $VPN
 			scheduleid01=$([guid]::NewGuid().ToString())
 			scheduleid02=$([guid]::NewGuid().ToString())
-            scheduleStartDate = (get-date).AddDays(1).ToString("yyyy/MM/dd")          
+            scheduleStartDate = (get-date).AddDays(1).ToString("yyyy/MM/dd") 
+			managementEnabled =  $Management
+			useFallbackLocation = $(if($FallbackLocation){'yes'}else{'no'})
+			fallbackLocation = $(if($FallbackLocation ){$FallbackLocation} else {'westeurope'})
+			OSVersion = $OS
 		}
 		$AzureParameters.Add('adminPassword',$SecurePassword)
 		
@@ -128,10 +214,10 @@ function New-SMBAzureDeployment {
 		
 	}
 	process{
-		
+		if(!$Continue){return}
 		Write-Log "Creating Resourcegroup '$($ResourceGroupName)'"
 		try {
-			$null = New-AzureRmResourceGroup -Name $ResourceGroupName -Location "westeurope" # currently hard-coded location, will Changed
+			$null = New-AzureRmResourceGroup -Name $ResourceGroupName -Location $Location
 		}
 		catch {
 			Write-log -Type Error -Message "Error while deploying resource group: $_"
@@ -139,14 +225,22 @@ function New-SMBAzureDeployment {
 		}
 		write-log "Deploying solution to resource group"
 		try{
-			$SyncHash = [hashtable]::Synchronized(@{})
+			if((Get-Variable -name 'SyncHash' -ErrorAction SilentlyContinue) -eq $null){
+				#write-log -message "Running in CLI mode"
+				$SyncHash = [hashtable]::Synchronized(@{})
+				$SyncHash.Root = $script:Root
+				$SyncHash.Log = $Log
+			} else {
+				#write-log -message "Running in GUI mode"
+			}
+
 			$SyncHash.ResourceGroupName = $ResourceGroupName
 			$SyncHash.DeploymentParameters = $AzureParameters
-			$SyncHash.Log = $Log
+		<#	$SyncHash.Log = $Log
 			$SyncHash.LogFunction = "$Root\functions\private\write-log.ps1"
 			$SyncHash.PopupFunction = "$Root\functions\private\invoke-message.ps1"
 			$SyncHash.ClassFunction = "$Root\functions\private\register-classes.ps1"
-			$SyncHash.OperationFunction = "$Root\functions\private\invoke-operation.ps1"
+			$SyncHash.OperationFunction = "$Root\functions\private\invoke-operation.ps1" #>
 			$CredentialGuid = [guid]::NewGuid().Guid
 			$null = Save-AzureRmProfile -path "$env:TEMP\SBSDeployment-$CredentialGuid.json" -Force
 
@@ -161,7 +255,7 @@ function New-SMBAzureDeployment {
 						Login='sysadmin'
 						Password = $SysAdminPassword
 						ResourceGroup = $ResourceGroupName
-						Connection = "https://$($CustomerNamePrefix.ToLower()).westeurope.cloudapp.azure.com/rdweb"
+						Connection = "https://$($CustomerNamePrefix.ToLower()).$($Location).cloudapp.azure.com/rdweb"
 					}
 				}
 				Completed = $false
@@ -169,10 +263,10 @@ function New-SMBAzureDeployment {
 				Log = $Log
 			}
 
-			$null = invoke-operation -synchash $SyncHash -code {
+			$null = invoke-operation -synchash $SyncHash -root $SyncHash.Root -Log $SyncHash.Log -code {
 				try{
 					$null = Select-AzureRmProfile -Path "$env:TEMP\SBSDeployment-$CredentialGuid.json"
-					$null = New-AzureRmResourceGroupDeployment -TemplateUri 'https://inovativbe.blob.core.windows.net/sbstemplate/azuredeploy.json' `
+					$null = New-AzureRmResourceGroupDeployment -TemplateUri 'https://inovativbe.blob.core.windows.net/sbstemplatedev/azuredeploy.json' `
 					-TemplateParameterObject $SyncHash.DeploymentParameters -ResourceGroupName $SyncHash.ResourceGroupName
 					if($? -eq $false){
 						throw $Error[1]
@@ -183,7 +277,7 @@ function New-SMBAzureDeployment {
 				
 			}
 			
-			$null = Invoke-Operation -synchash $SyncHash -code {
+			$null = Invoke-Operation -synchash $SyncHash -log $SyncHash.Log -root $SyncHash.Root -code {
 				try {
 					$null = select-azurermprofile -path "$env:TEMP\SBSDeployment-$CredentialGuid.json"
 					$DeploymentStatus = Get-AzureRmResourceGroupDeployment -ResourceGroupName $SyncHash.ResourceGroupName

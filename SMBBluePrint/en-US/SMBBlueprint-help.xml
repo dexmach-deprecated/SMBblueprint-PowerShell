@@ -49,7 +49,7 @@
 <dev:defaultValue>False</dev:defaultValue>
 </command:parameter>
 <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>Backup</maml:name>
-<maml:Description><maml:para>Specifies the size of the backup vault to deploy. 'None' can be used to disable the deployment of this resource.
+<maml:Description><maml:para>Specifies the size of the backup vault to deploy. 'None' can be used to disable the deployment of this resource. If the selected Azure location does not support the backup resource, it will not be deployed regardless of this setting.
 </maml:para>
 </maml:Description>
 <command:parameterValueGroup><command:parameterValue required="false" variableLength="false">none</command:parameterValue>
@@ -156,6 +156,57 @@
 <dev:type><maml:name>String</maml:name>
 <maml:uri /></dev:type>
 <dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>FallbackLocation</maml:name>
+<maml:Description><maml:para>The location to use for the monitoring- and automation services in case the primary region does not support them. The supported fallback locations are: * westeurope
+</maml:para>
+<maml:para>* southeastasia
+</maml:para>
+<maml:para>* australiasoutheast
+</maml:para>
+<maml:para>
+</maml:para>
+<maml:para>When this parameter is omitted and the primary region is not supported, you will be prompted to choose one of the locations, or cancel the deployment.
+</maml:para>
+</maml:Description>
+<command:parameterValueGroup><command:parameterValue required="false" variableLength="false">westeurope</command:parameterValue>
+<command:parameterValue required="false" variableLength="false">southeastasia</command:parameterValue>
+<command:parameterValue required="false" variableLength="false">australiasoutheast</command:parameterValue>
+</command:parameterValueGroup>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>Location</maml:name>
+<maml:Description><maml:para>The Azure location where the solution should be deployed. Some locations impose limits in regards to the backup, automation and monitoring capabilities. Check the 'Backup' and 'FallbackLocation' parameters for more information.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>Management</maml:name>
+<maml:Description><maml:para>Controls whether the monitoring and automation resources are deployed. In the current version, this option is not usable and the resources are always deployed.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>free</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>OS</maml:name>
+<maml:Description><maml:para>Determines the used operating system for the VM deployments. Currently '2012R2' and '2016' are the only supported parameters.
+</maml:para>
+</maml:Description>
+<command:parameterValueGroup><command:parameterValue required="false" variableLength="false">'2012R2'</command:parameterValue>
+<command:parameterValue required="false" variableLength="false">'2016'</command:parameterValue>
+</command:parameterValueGroup>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>'2012R2'</dev:defaultValue>
 </command:parameter>
 </command:syntaxItem>
 <command:syntaxItem><maml:name>New-SMBAzureDeployment</maml:name>
@@ -193,7 +244,7 @@
 <dev:defaultValue>False</dev:defaultValue>
 </command:parameter>
 <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>Backup</maml:name>
-<maml:Description><maml:para>Specifies the size of the backup vault to deploy. 'None' can be used to disable the deployment of this resource.
+<maml:Description><maml:para>Specifies the size of the backup vault to deploy. 'None' can be used to disable the deployment of this resource. If the selected Azure location does not support the backup resource, it will not be deployed regardless of this setting.
 </maml:para>
 </maml:Description>
 <command:parameterValueGroup><command:parameterValue required="false" variableLength="false">none</command:parameterValue>
@@ -301,6 +352,57 @@
 <maml:uri /></dev:type>
 <dev:defaultValue>None</dev:defaultValue>
 </command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>FallbackLocation</maml:name>
+<maml:Description><maml:para>The location to use for the monitoring- and automation services in case the primary region does not support them. The supported fallback locations are: * westeurope
+</maml:para>
+<maml:para>* southeastasia
+</maml:para>
+<maml:para>* australiasoutheast
+</maml:para>
+<maml:para>
+</maml:para>
+<maml:para>When this parameter is omitted and the primary region is not supported, you will be prompted to choose one of the locations, or cancel the deployment.
+</maml:para>
+</maml:Description>
+<command:parameterValueGroup><command:parameterValue required="false" variableLength="false">westeurope</command:parameterValue>
+<command:parameterValue required="false" variableLength="false">southeastasia</command:parameterValue>
+<command:parameterValue required="false" variableLength="false">australiasoutheast</command:parameterValue>
+</command:parameterValueGroup>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>Location</maml:name>
+<maml:Description><maml:para>The Azure location where the solution should be deployed. Some locations impose limits in regards to the backup, automation and monitoring capabilities. Check the 'Backup' and 'FallbackLocation' parameters for more information.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>Management</maml:name>
+<maml:Description><maml:para>Controls whether the monitoring and automation resources are deployed. In the current version, this option is not usable and the resources are always deployed.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>free</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>OS</maml:name>
+<maml:Description><maml:para>Determines the used operating system for the VM deployments. Currently '2012R2' and '2016' are the only supported parameters.
+</maml:para>
+</maml:Description>
+<command:parameterValueGroup><command:parameterValue required="false" variableLength="false">'2012R2'</command:parameterValue>
+<command:parameterValue required="false" variableLength="false">'2016'</command:parameterValue>
+</command:parameterValueGroup>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>'2012R2'</dev:defaultValue>
+</command:parameter>
 </command:syntaxItem>
 </command:syntax>
 <command:parameters><command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>AdditionalSQLInstanceSize</maml:name>
@@ -331,7 +433,7 @@
 <dev:defaultValue>False</dev:defaultValue>
 </command:parameter>
 <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>Backup</maml:name>
-<maml:Description><maml:para>Specifies the size of the backup vault to deploy. 'None' can be used to disable the deployment of this resource.
+<maml:Description><maml:para>Specifies the size of the backup vault to deploy. 'None' can be used to disable the deployment of this resource. If the selected Azure location does not support the backup resource, it will not be deployed regardless of this setting.
 </maml:para>
 </maml:Description>
 <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
@@ -437,6 +539,50 @@
 <dev:type><maml:name>String</maml:name>
 <maml:uri /></dev:type>
 <dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>FallbackLocation</maml:name>
+<maml:Description><maml:para>The location to use for the monitoring- and automation services in case the primary region does not support them. The supported fallback locations are: * westeurope
+</maml:para>
+<maml:para>* southeastasia
+</maml:para>
+<maml:para>* australiasoutheast
+</maml:para>
+<maml:para>
+</maml:para>
+<maml:para>When this parameter is omitted and the primary region is not supported, you will be prompted to choose one of the locations, or cancel the deployment.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>Location</maml:name>
+<maml:Description><maml:para>The Azure location where the solution should be deployed. Some locations impose limits in regards to the backup, automation and monitoring capabilities. Check the 'Backup' and 'FallbackLocation' parameters for more information.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>Management</maml:name>
+<maml:Description><maml:para>Controls whether the monitoring and automation resources are deployed. In the current version, this option is not usable and the resources are always deployed.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>free</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>OS</maml:name>
+<maml:Description><maml:para>Determines the used operating system for the VM deployments. Currently '2012R2' and '2016' are the only supported parameters.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>'2012R2'</dev:defaultValue>
 </command:parameter>
 </command:parameters>
 <command:inputTypes><command:inputType><dev:type><maml:name>None</maml:name>

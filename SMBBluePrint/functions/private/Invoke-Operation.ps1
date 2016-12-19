@@ -4,12 +4,31 @@ function Invoke-Operation {
                 [switch] $Wait,
                 [scriptblock] $Code ={},
                 [hashtable] $Parameters,
+                 [Parameter(Mandatory=$true)]
+                [ValidateNotNullOrEmpty()]
                 [hashtable] $SyncHash,
-                [string] $Root = (split-path $PSScriptRoot),
-                [string] $Log = $SyncHash.Log
+                [Parameter(Mandatory=$true)]
+                [ValidateNotNullOrEmpty()]
+                [string] $Root,
+                 [Parameter(Mandatory=$true)]
+                [ValidateNotNullOrEmpty()]
+                [string] $Log
             )
             try {
-                
+                if(!$Root){
+                    if($SyncHash.Root){
+                        $Root = $SyncHash.Root
+                    } else {
+                        throw "Invalid Root"
+                    }
+                }
+                if(!$Log){
+                    if($SyncHash.Log){
+                        $Log = $SyncHash.Log
+                    } else {
+                        throw "Invalid Log"
+                    }
+                }
                 $Runspace = [runspacefactory]::CreateRunspace()
                 $Runspace.ApartmentState = "STA"
                 $Runspace.ThreadOptions = "ReuseThread"

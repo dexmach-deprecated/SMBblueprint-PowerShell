@@ -27,26 +27,26 @@ Function Start-SMBDeploymentGUI {
 		CommandName = $null
 		CommandParameters = $null
         MailDomain = $null
-		
-
+		AzureLocation = $null
+		FallbackAction = $null
+		Management = 'free'
+		OS = '2016'
 	}
 	write-host "Please wait while the graphical interface is being loaded"
 	if($Log -eq $null){
 		$Log = Start-Log
 	}
+
 	$SyncHash.Module = "$Root\SMBDeployment.psd1"
 	$SyncHash.XAML = (get-xaml)
-
+	
 	$SyncHash.Root = $script:Root
-	$SyncHash.LogFunction = "$Root\functions\private\write-log.ps1"
-	$SyncHash.ClassFunction = "$Root\functions\private\register-classes.ps1"
-	$SyncHash.OperationFunction = "$Root\functions\private\invoke-operation.ps1"
-	$SyncHash.PopupFunction = "$Root\functions\private\invoke-message.ps1"
+	
 	$SyncHash.Log = $Log
 	$SyncHash.LogName = $LogName
 	
 	
-	$null = invoke-operation -log $Log -root $script:root -synchash $SyncHash -code {
+	$null = invoke-operation -log $SyncHash.Log -root $SyncHash.Root -synchash $SyncHash -code {
 		try{
 
 			# Create GUI windows from WPF XAML
@@ -98,6 +98,12 @@ Function Start-SMBDeploymentGUI {
 				
 				$SyncHash.WPF_Cmb_Subscriptions.ItemsSource = $SyncHash.ViewModel.Subscriptions
 				$SyncHash.WPF_Cmb_Subscriptions.SelectedIndex = 0
+				$Locations = @()
+				foreach($Location in (get-azurermlocation)){
+					$Locations += $Location.Location
+				}
+				$Locations = $Locations|sort
+				$SyncHash.WPF_Cmb_PrimaryLocation.ItemsSource = $Locations
 				$SyncHash.WPF_Cmb_Licenses.ItemsSource = $SyncHash.ViewModel.Licenses.Values
 				$SyncHash.WPF_Cmb_Licenses.SelectedIndex = 0
                 $SyncHash.ViewModel.MailDomain = (Get-MsolDomain -TenantId $Selectedtenant.Id|where{$_.IsDefault -eq $true}).Name
@@ -157,7 +163,7 @@ Function Start-SMBDeploymentGUI {
 				
 				
 				
-				$job = invoke-operation -synchash $SyncHash -Code {
+				$job = invoke-operation -synchash $SyncHash -Log $SyncHash.Log -Root $SyncHash.Root -Code {
 					try{                 
 						
 						$SyncHash.GUI.Dispatcher.Invoke(
@@ -392,12 +398,91 @@ Function Start-SMBDeploymentGUI {
 
 			})
 
+			$SyncHash.WPF_Cmb_PrimaryLocation.Add_SelectionChanged({
+				$SyncHash.ViewModel.AzureLocation = $SyncHash.WPF_Cmb_PrimaryLocation.SelectedItem
+				Write-Log -Type Information -Message "Azure Location changed to '$($SyncHash.ViewModel.AzureLocation)', checking compatibility using file '$($SyncHash.Root)\resources'"
+				$Result = Test-AzureResourceLocation -Location $SyncHash.WPF_Cmb_PrimaryLocation.SelectedItem -ResourceFile "$($SyncHash.Root)\resources"
+				if(((get-variable -Name Result -ErrorAction Ignore) -eq $null) -or ($Result -eq $null)){
+					$Count = 0
+				} else {
+					$Count = $Result.Count
+				}
+				if($Count -gt 0){
+					if($Result -contains "microsoft.automation" -or $Result -contains "microsoft.operationsmanagement" -or $Result -contains "microsoft.operationalinsights"){
+					Invoke-Message "The location you selected does not support all services present in the deployment. Please choose a fallback action."
+					$SyncHash.GUI.Dispatcher.Invoke(
+						'Render',
+						[action]{
+							$SyncHash.WPF_Spl_ServiceUnavailable.Visibility = [System.Windows.Visibility]::visible;
+							$SyncHash.WPF_Cmb_FallbackAction.SelectedIndex = 0
+							$SyncHash.ViewModel.FallbackAction = "westeurope"
+						}
+					)
+				} else {
+					$SyncHash.ViewModel.FallbackAction = $null
+					$SyncHash.GUI.Dispatcher.Invoke(
+						'Render',
+						[action]{
+							$SyncHash.WPF_Spl_ServiceUnavailable.Visibility = [System.Windows.Visibility]::collapsed;
+
+						}
+					)
+
+				}
+				if($Result -contains "Microsoft.RecoveryServices"){
+					Invoke-Message "Backup is not availabe at this location. The option will be disabled"
+					$SyncHash.GUI.Dispatcher.Invoke(
+						'Render',
+						[action]{
+							$SyncHash.WPF_Cmb_Backup.SelectedIndex = 0
+							$SyncHash.ViewModel.Backup = 'none'
+							$SyncHash.WPF_Cmb_Backup.IsEnabled = $false
+
+						}
+					)
+
+				} else {
+					$SyncHash.GUI.Dispatcher.Invoke(
+						'Render',
+						[action]{
+
+							$SyncHash.WPF_Cmb_Backup.IsEnabled = $true
+
+						}
+					)
+
+				}
+			} else {
+				$SyncHash.ViewModel.FallbackAction = $null
+				$SyncHash.GUI.Dispatcher.Invoke(
+						'Render',
+						[action]{
+							$SyncHash.WPF_Spl_ServiceUnavailable.Visibility = [System.Windows.Visibility]::collapsed;
+							$SyncHash.WPF_Cmb_Backup.IsEnabled = $true
+
+						}
+					)
+
+			}
+			})
+			
+
+			$SyncHash.WPF_Cmb_FallbackAction.Add_SelectionChanged({
+				$SyncHash.ViewModel.FallbackAction = $SyncHash.WPF_Cmb_FallbackAction.SelectedItem.Tag
+				Write-Log -Message "Fallback set to $($SyncHash.ViewModel.FallbackAction)"
+			})
+			$SyncHash.WPF_Cmb_OS.Add_SelectionChanged({
+				$SyncHash.ViewModel.OS = $SyncHash.WPF_Cmb_OS.SelectedItem.Tag
+				Write-Log -Message "OS set to $($SyncHash.ViewModel.OS)"
+			})
+
 			$SyncHash.WPF_btn_Deploy.Add_Click(
 			{
 				if(
 						($SyncHash.ViewModel.CustomerName.length -eq 0) -or
 						($SyncHash.ViewModel.Subscriptions.Count -eq 0) -or
-						(($SyncHash.ViewModel.ActiveSubscription) -eq $null)
+						(($SyncHash.ViewModel.ActiveSubscription) -eq $null) -or
+						($SyncHash.ViewModel.AzureLocation) -eq $null
 						){
 					invoke-message "Not all parameters are provided for deployment"
 					return
@@ -408,7 +493,7 @@ Function Start-SMBDeploymentGUI {
 					Invoke-Message -Message "The target resource group $($SyncHash.ViewModel.ResourceGroup) already exists, please modify the customer prefix"
 					return
 				}
-				if((Test-AzureRmDnsAvailability -DomainNameLabel $SyncHash.ViewModel.CustomerName.ToLower() -Location "westeurope") -eq $false){
+				if((Test-AzureRmDnsAvailability -DomainNameLabel $SyncHash.ViewModel.CustomerName.ToLower() -Location $SyncHash.ViewModel.AzureLocation) -eq $false){
 					write-log -type error -Message "The public DNS record for this customer name is already taken, please choose another customer name"
 					return
 				}
@@ -416,6 +501,7 @@ Function Start-SMBDeploymentGUI {
 					invoke-message -message "'Microsoft' can not be a part of the customer name, please choose another customer name"
 					return
 				}
+				
 				
 				$Overview = `
 				"The deployment will be started with the following parameters:`r`n" +`
@@ -428,6 +514,10 @@ Function Start-SMBDeploymentGUI {
 				"Extra VM Size: $($SyncHash.ViewModel.VMSize)`r`n" +`
 				"Backup Plan: $($SyncHash.ViewModel.Backup)`r`n" +`
 				"VPN Plan: $($SyncHash.ViewModel.VPN)`r`n" +`
+				"Management: $($SyncHash.viewModel.Management)`r`n" +
+				"Location: $($SyncHash.viewModel.AzureLocation)`r`n" +
+				"Fallback Action: $($SyncHash.viewModel.FallbackAction)`r`n" +
+				"OS: $($SyncHash.viewModel.OS)`r`n" +
 				"`r`n" +`
 				"Please note this credential for use with the solution:`r`n" +`
 				"User: sysadmin`r`n" +`
@@ -451,7 +541,13 @@ Function Start-SMBDeploymentGUI {
 						VPN=$SyncHash.ViewModel.VPN
 						Backup=$SyncHash.ViewModel.Backup
 						Log=$Log
+						Location=$SyncHash.ViewModel.AzureLocation
+						Management=$SyncHash.ViewModel.Management
+						OS=$SyncHash.ViewModel.OS
 
+					}
+					if($SyncHash.ViewModel.FallbackAction -ne $null){
+						$DeploymentParameters.Add("FallbackLocation",$SyncHash.ViewModel.FallbackAction)
 					}
 					$SyncHash.ViewModel.CommandName = "New-SMBAzureDeployment"
 					$SyncHash.ViewModel.CommandParameters = $DeploymentParameters
@@ -466,7 +562,6 @@ Function Start-SMBDeploymentGUI {
 					
 					$job = invoke-operation -synchash $SyncHash -root $SyncHash.Root -log $SyncHash.Log -code {
 						try {
-							#  . "$($SyncHash.Root)\functions\public\New-SBSAzureDeployment.ps1"
 							
 							$SyncHash.DeploymentJob = New-SMBAzureDeployment @Parameters
 							while($SyncHash.DeploymentJob.Completed -ne $true){
@@ -528,7 +623,7 @@ Function Start-SMBDeploymentGUI {
 					$User.Last = $SyncHash.WPF_Txt_LastName.Text
 					$User.Title = $SyncHash.WPF_Txt_Function.Text
 					$User.Department = $SyncHash.WPF_Txt_Department.Text
-					$User.Country = $SyncHash.WPF_Cmb_Country.SelectedItem.Tag
+					$User.Country = ([country]($SyncHash.WPF_Cmb_Country.SelectedItem)).Code
 					$User.Office = $SyncHash.WPF_Txt_Office.Text
 					$User.Mobile = $SyncHash.WPF_Txt_Mobile.Text
 					$User.DisplayName = [Regex]::Replace($User.First,'[^a-zA-Z0-9]', '') + "." + [Regex]::Replace($User.Last,'[^a-zA-Z0-9]', '')
@@ -794,14 +889,17 @@ Function Start-SMBDeploymentGUI {
 			})
 			$SyncHash.WPF_Btn_O365Link.Visibility = [System.Windows.Visibility]::collapsed
 			$SyncHash.WPF_Btn_AzureLink.Visibility = [System.Windows.Visibility]::collapsed
+			$SyncHash.WPF_Spl_ServiceUnavailable.Visibility = [System.Windows.Visibility]::collapsed
 			$SyncHash.GUI.DataContext = $SyncHash.ViewModel
+			$SyncHash.WPF_Cmb_Country.Items.Clear()
+			$SyncHash.WPF_Cmb_Country.ItemsSource = Get-Country
 			
 			$SyncHash.GUI.ShowDialog()
 			
 
 		} catch {
 			invoke-message "$_ @ $($_.InvocationInfo.ScriptLineNumber) - $($_.InvocationInfo.Line))"
-			#Invoke-Message "$_ @ $($_.InvocationInfo.ScriptLineNumber))"
+
 		}
 		finally {
 			if($SyncHash.GUI.IsVisible){
@@ -809,7 +907,7 @@ Function Start-SMBDeploymentGUI {
 			}
 			$SyncHash.LogWatcher.Stop()
 			$SyncHash.LogGUI = $false;
-			# Unregister-Event -SourceIdentifier FileChanged -ErrorAction Ignore
+			
 			
 			
 		}
