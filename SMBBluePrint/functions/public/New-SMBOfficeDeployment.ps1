@@ -32,7 +32,7 @@ function New-SMBOfficeDeployment {
 	)
 	
 	begin{
-		
+		$ATPLicenseName = "ADALLOM_O365"
 		$Continue = $true
 		if([string]::IsNullOrEmpty($Log) -eq $false){
 			if(test-path $Log){} else {

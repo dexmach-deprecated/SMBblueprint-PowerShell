@@ -299,7 +299,7 @@ function New-SMBAzureDeployment {
 			$null = invoke-operation -synchash $SyncHash -root $SyncHash.Root -Log $SyncHash.Log -code {
 				try{
 					$null = Select-AzureRmProfile -Path "$env:TEMP\SBSDeployment-$CredentialGuid.json"
-					$null = New-AzureRmResourceGroupDeployment -TemplateUri $script:TemplateUrl `
+					$null = New-AzureRmResourceGroupDeployment -TemplateUri "https://raw.githubusercontent.com/Inovativ/SMBblueprint-ARM/master/azuredeploy.json" `
 					-TemplateParameterObject $SyncHash.DeploymentParameters -ResourceGroupName $SyncHash.ResourceGroupName
 					if($? -eq $false){
 						throw $Error[1]
