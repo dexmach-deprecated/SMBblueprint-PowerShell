@@ -21,8 +21,8 @@ function ConvertTo-O365{
 		[user]::new()|get-member -MemberType Property|%{$UserProperties += $_.Name}
 		foreach($Property in $CSVProperties){
 			if($UserProperties -notcontains $Property.Name){
-				write-log -Type Error -Message "CSV was not in the correct format: '$($Property.Name)' is not recognized."
-				return $null
+				throw "CSV was not in the correct format: '$($Property.Name)' is not recognized."
+				
 			}
 		}
 		foreach($Item in $Content){
@@ -32,16 +32,18 @@ function ConvertTo-O365{
 					"DisplayName" {$User.DisplayName = [Regex]::Replace($Item.First,'[^a-zA-Z0-9]', '') + "." + [Regex]::Replace($Item.Last,'[^a-zA-Z0-9]', '')}
 					"Password"{break;}
 					"Login"{break;}
-					"License" {
-						if(($License = $Licenses[$Item.License]) -ne $null){
-							
-							if($License.Available -le 0){
-								throw "There are not enough licenses available to provision the users ($($License.Name))"
+					"Licenses" {
+						foreach($LicenseString in $Item.Licenses.Split("|")){
+							if(($License = $Licenses[$LicenseString]) -ne $null){
+								
+								if($License.Available -le 0){
+									throw "There are not enough licenses available to provision the users ($($License.Name))"
+								}
+								$User.Licenses.Add($License)
+								$License.Available--
+							} else {
+								Write-Log -Type Warning -Message "License $($Item.License) for user $($Item.DisplayName) not found in the subscription"
 							}
-							$User.License = $License
-							$License.Available--
-						} else {
-							Write-Log -Type Warning -Message "License $($Item.License) for user $($Item.DisplayName) not found in the subscription"
 						}
 						break;
 					}

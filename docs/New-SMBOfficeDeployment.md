@@ -15,13 +15,13 @@ It uses a set of given deployment parameters to start and monitor the user/group
 ### TenantId (Default)
 ```
 New-SMBOfficeDeployment -CSV <String> -TenantId <String> [-MailDomain <String>] [-DefaultPassword <String>]
- -Credential <PSCredential> [-SyncHash <Object>] [-Log <String>] [<CommonParameters>]
+ -Credential <PSCredential> [-SyncHash <Object>] [-NoUpdateCheck] [-Log <String>] [<CommonParameters>]
 ```
 
 ### TenantDomain
 ```
 New-SMBOfficeDeployment -CSV <String> -TenantDomain <String> [-MailDomain <String>] [-DefaultPassword <String>]
- -Credential <PSCredential> [-SyncHash <Object>] [-Log <String>] [<CommonParameters>]
+ -Credential <PSCredential> [-SyncHash <Object>] [-NoUpdateCheck] [-Log <String>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -74,14 +74,14 @@ The following information must be present in this file:
 * Groups (the group to which the user should belong)
     * If the group is mentioned for the first time, the associated user will be set as owner. Subsequent users that have the same group specified will be a regular member.
     * The created groups will be private Office Groups
-* License (the license to assign to the user, expressed as the SKU code, which can be found using get-msolaccountsku -TenantId \<ID of your CSP tenant\>)
+* Licenses (the licenses to assign to the user, expressed as the SKU code and separated by '|', which can be found using get-msolaccountsku -TenantId \<ID of your CSP tenant\>)
     * You can get the tenant-id's under your CSP account by connecting to your root Azure AD with 'Connect-MSOLService' and then querying the tenants with 'Get-MSOLPartnerContract -All|select DefaultDomainName,TenantId'
 
 >**Example CSV:**  
-First,Last,Title,DisplayName,Department,Office,Mobile,Country,Groups,License  
-Jan,Van Meirvenne,Consultant,Jan.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGroup1,O365_BUSINESS_PREMIUM  
-Jin,Van Meirvenne,Consultant,Jin.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGroup10,O365_BUSINESS_PREMIUM  
-Jon,Van Meirvenne,Consultant,Jon.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGroup10,O365_BUSINESS_PREMIUM  
+>First,Last,Title,DisplayName,Department,Office,Mobile,Country,Groups,Licenses  
+>Jan,Van Meirvenne,Consultant,Jan.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGroup1,ADALLOM_O365|POWER_BI_STANDARD  
+>Jin,Van Meirvenne,Consultant,Jin.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGroup10,ADALLOM_O365|POWER_BI_STANDARD  
+>Jon,Van Meirvenne,Consultant,Jon.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGroup10,ADALLOM_O365|POWER_BI_STANDARD  
 
 
 
@@ -185,6 +185,21 @@ Parameter Sets: TenantId
 Aliases: 
 
 Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -NoUpdateCheck
+Skips the module version check when launching the command
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases: 
+
+Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False

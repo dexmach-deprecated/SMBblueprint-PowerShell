@@ -53,13 +53,52 @@ function New-SMBAzureDeployment {
 	[Parameter(DontShow=$true)]
 	[ValidateNotNullOrEmpty()]
 	[string] $ResourceGroupPrefix = "smb_rg_",
+	[Parameter()]
+	[switch] $NoUpdateCheck,
+	[Parameter()]
+	[ValidateSet('Standard_LRS',"Standard_ZRS","Standard_GRS","Standard_RAGRS","Premium_LRS")]
+	[string] $StorageType,
 	[Parameter(DontShow=$true)]
 	[string] $Log = $null
 
 
 	)
+
+<#	DynamicParam {
+			$ARM = ((invoke-webrequest -Uri $script:TemplateUrl -UseBasicParsing).Content)|ConvertFrom-Json
+            # Set the dynamic parameters' name
+            $ParameterName = 'StorageType'
+            
+            # Create the dictionary 
+            $RuntimeParameterDictionary = New-Object System.Management.Automation.RuntimeDefinedParameterDictionary
+
+            # Create the collection of attributes
+            $AttributeCollection = New-Object System.Collections.ObjectModel.Collection[System.Attribute]
+            
+            # Create and set the parameters' attributes
+            $ParameterAttribute = New-Object System.Management.Automation.ParameterAttribute
+            $ParameterAttribute.Mandatory = $false
+            $ParameterAttribute.Position = 1
+
+            # Add the attributes to the attributes collection
+            $AttributeCollection.Add($ParameterAttribute)
+
+            # Generate and set the ValidateSet 
+            $arrSet = $ARM.Parameters.StorageType.allowedValues
+            $ValidateSetAttribute = New-Object System.Management.Automation.ValidateSetAttribute($arrSet)
+
+            # Add the ValidateSet to the attributes collection
+            $AttributeCollection.Add($ValidateSetAttribute)
+
+            # Create and return the dynamic parameter
+            $RuntimeParameter = New-Object System.Management.Automation.RuntimeDefinedParameter($ParameterName, [string], $AttributeCollection)
+			$RunTimeParameter.Value = $ARM.Parameters.StorageType.defaultValue
+            $RuntimeParameterDictionary.Add($ParameterName, $RuntimeParameter)
+            return $RuntimeParameterDictionary
+    } #>
 	
 	begin{
+	<#	$StorageType = $PSBoundParameters["StorageType"] #>
 		$Continue = $true
 		$Management = 'free'
 		if([string]::IsNullOrEmpty($Log) -eq $false){
@@ -70,6 +109,9 @@ function New-SMBAzureDeployment {
 			$Log = Start-Log
 		}
 		$PSDefaultParameterValues = @{"Write-Log:Log"=$Log}
+		if(!$PSBoundParameters.ContainsKey('NoUpdateCheck')){
+			Test-ModuleVersion -ModuleName SMBBluePrint
+		}
 
 		$CustomerNamePrefix = [Regex]::Replace($CustomerName,'[^a-zA-Z0-9]', '')
 		$ResourceGroupName = "$ResourceGroupPrefix$CustomerNamePrefix"
@@ -80,18 +122,9 @@ function New-SMBAzureDeployment {
 		if($Credential){
 			try {
 				Connect-MsolService -Credential $Credential
-				if($TenantId){
+				$Tenant = Get-Tenant -TenantDomain $TenantDomain -TenantId $TenantId
+				if($Tenant.Default -eq $false){
 					$null = Add-AzureRMAccount -Credential $Credential -TenantId $TenantId
-				} elseif ($TenantDomain){
-					if(($TenantId = ((Get-MsolPartnerContract -all).where{$_.DefaultDomainName -eq $TenantDomain}).TenantId) -eq $null){
-						Write-Log -Type Error -Message "Tenant Domain not found"
-					} elseif($TenantId.GetType().IsArray) {
-						Write-Log -Type Error -Message "There are multiple tenants with the specified domain name. Please use Tenant ID to specify an exact target tenant."
-					} else {
-						# everything OK
-					}
-					$null = Add-AzureRMAccount -Credential $Credential -TenantId $TenantId
-					
 				} else {
 					$null = Add-AzureRMAccount -Credential $Credential
 				}
@@ -125,6 +158,10 @@ function New-SMBAzureDeployment {
 		if($CustomerNamePrefix -like "*microsoft*"){
 			write-log -type error -message "'Microsoft' can not be a part of the customer name, please choose another customer name"
 			return
+		}
+		if((Test-AADPasswordComplexity -MinimumLength 12 -Password $SysAdminPassword) -eq $false){
+					write-log -type error -message "Password does not meet complexity requirements"
+					return
 		}
 
 		$CompatibilityResults = Test-AzureResourceLocation -Location $Location -ResourceFile "$Root\resources"
@@ -207,6 +244,7 @@ function New-SMBAzureDeployment {
 			useFallbackLocation = $(if($FallbackLocation){'yes'}else{'no'})
 			fallbackLocation = $(if($FallbackLocation ){$FallbackLocation} else {'westeurope'})
 			OSVersion = $OS
+			StorageType = $StorageType
 		}
 		$AzureParameters.Add('adminPassword',$SecurePassword)
 		
@@ -236,11 +274,6 @@ function New-SMBAzureDeployment {
 
 			$SyncHash.ResourceGroupName = $ResourceGroupName
 			$SyncHash.DeploymentParameters = $AzureParameters
-		<#	$SyncHash.Log = $Log
-			$SyncHash.LogFunction = "$Root\functions\private\write-log.ps1"
-			$SyncHash.PopupFunction = "$Root\functions\private\invoke-message.ps1"
-			$SyncHash.ClassFunction = "$Root\functions\private\register-classes.ps1"
-			$SyncHash.OperationFunction = "$Root\functions\private\invoke-operation.ps1" #>
 			$CredentialGuid = [guid]::NewGuid().Guid
 			$null = Save-AzureRmProfile -path "$env:TEMP\SBSDeployment-$CredentialGuid.json" -Force
 
@@ -266,7 +299,7 @@ function New-SMBAzureDeployment {
 			$null = invoke-operation -synchash $SyncHash -root $SyncHash.Root -Log $SyncHash.Log -code {
 				try{
 					$null = Select-AzureRmProfile -Path "$env:TEMP\SBSDeployment-$CredentialGuid.json"
-					$null = New-AzureRmResourceGroupDeployment -TemplateUri 'https://inovativbe.blob.core.windows.net/sbstemplatedev/azuredeploy.json' `
+					$null = New-AzureRmResourceGroupDeployment -TemplateUri $script:TemplateUrl `
 					-TemplateParameterObject $SyncHash.DeploymentParameters -ResourceGroupName $SyncHash.ResourceGroupName
 					if($? -eq $false){
 						throw $Error[1]

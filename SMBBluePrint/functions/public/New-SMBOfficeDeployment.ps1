@@ -11,7 +11,7 @@ function New-SMBOfficeDeployment {
 	[ValidateNotNullOrEmpty()]
 	[string] $TenantId,
 	[parameter(ParameterSetName="TenantDomain",Mandatory=$true)]
-	[ValidateNotNullOrEmpty()]
+	#[ValidateNotNullOrEmpty()]
 	[string] $TenantDomain,
 	[parameter()]
 	[string] $MailDomain,
@@ -25,11 +25,15 @@ function New-SMBOfficeDeployment {
 	[Parameter(DontShow)]
 	[ValidateNotNullOrEmpty()]
 	[object] $SyncHash = $null,
+	[Parameter()]
+	[switch] $NoUpdateCheck,
 	[Parameter(DontShow=$true)]
 	[string] $Log
 	)
 	
 	begin{
+		
+		$Continue = $true
 		if([string]::IsNullOrEmpty($Log) -eq $false){
 			if(test-path $Log){} else {
 				$Log = Start-Log
@@ -38,9 +42,16 @@ function New-SMBOfficeDeployment {
 			$Log = Start-Log
 		}
 		$PSDefaultParameterValues = @{"Write-Log:Log"="$Log"}
+		if(!$PSBoundParameters.ContainsKey('NoUpdateCheck')){
+		Test-ModuleVersion -ModuleName SMBBluePrint
+	}
 
 
 		try{
+			if((Test-AADPasswordComplexity -MinimumLength 8 -Password $DefaultPassword) -eq $false){
+					write-log -type error -message "Password does not meet complexity requirements"
+					return
+			}
 			$DeploymentJob = new-object psobject -Property @{
 				Type="Office"
 				Duration = "00:00:00"
@@ -57,14 +68,17 @@ function New-SMBOfficeDeployment {
 			}
 			$DeploymentStart = get-date
 			$null = Connect-MsolService -Credential $Credential
-			if($TenantDomain){
-				$TenantId = ((Get-MsolPartnerContract -all).where{$_.DefaultDomainName -eq $TenantDomain}).TenantId
+			# Hash both internal and external tenant information
+		<#	$TenantDomainHash = @{}
+			foreach($Item in (get-msolpartnercontract -all)){
+				$TenantHash.Add($Item.TenantId,$Item.DefaultDomainName)
 			}
-			elseif($TenantId){$TenantDomain = ((Get-MsolPartnerContract).where{$_.TenantId -eq $TenantId}).DefaultDomainName}
-			else{
-				Write-Error -Type Error -Message "Invalid or missing tenant information provided"
-				return $null
-			}
+			$CompanyInfo = Get-MsolCompanyInformation
+			$TenantHash.Add($CompanyInfo.ObjectId,$CompanyInfo.InitialDomain)
+			#>
+			$Tenant = Get-Tenant -TenantId $TenantId -TenantDomain $TenantDomain
+			$TenantId = $Tenant.Id
+			
 			$PSDefaultParameterValues.Add('*-MSOL*:TenantId',$TenantId)
 			$DefaultDomain = $(
 				$VerifiedDomains = Get-MsolDomain -Status Verified
@@ -88,23 +102,28 @@ function New-SMBOfficeDeployment {
 			
 			write-log "Getting available licenses from O365"
 			$Licenses = Get-O365License -TenantId $TenantId
+			write-log "Generating O365 Deployment Inventory"
+			$Inventory = ConvertTo-O365 -Path $CSV -Licenses $Licenses -Separator ','
 			write-log "Creating CSP admin account"
-			$CSPAdminCredential = new-cspadmin -DomainName $TenantDomain
+			$CSPAdminCredential = new-cspadmin -DomainName $MailDomain
 
 			
 			
 		} catch {
 			Write-Log -Type Error -Message "Error during Office 365 Connection: $_"
+			$Continue = $false
+			
 		}
 	}
 	
 	
 	
 	process{
-
+		if($Continue -eq $false){
+			return
+		}
 		try {
-			write-log "Generating O365 Deployment Inventory"
-			$Inventory = ConvertTo-O365 -Path $CSV -Licenses $Licenses -Separator ','
+			
 			##### Exchange Connection
 			write-log "Opening remote session to Exchange online"
 			$Connect = $false
@@ -124,6 +143,7 @@ function New-SMBOfficeDeployment {
 			
 			write-log -type information -message "Provisioning Users"
 			$OneDriveUsers = @()
+			$EnableATP = $false
 			$i = 0
 			foreach($User in $Inventory.Users){
 				$i++
@@ -132,12 +152,12 @@ function New-SMBOfficeDeployment {
 				-CurrentOperation "$i/$($Inventory.Users.Count)"`
 				-PercentComplete (($i/$($Inventory.Users.Count))*100)
 				$UserParameters = @{
-					Username=[Regex]::Replace("$($User.First).$($User.Last)@$($DefaultDomain)",'[^a-zA-Z0-9\@\.]', '')
+					Username=[Regex]::Replace("$($User.First).$($User.Last)@$($DefaultDomain)",'[^a-zA-Z0-9\@\.\-]', '')
 					FirstName=$User.First
 					LastName=$User.Last
 					Title=$User.Title
 					Password=$DefaultPassword
-					License=$User.License.Id
+					License=$($User.Licenses.Id)
 					MobilePhone=$User.Mobile
 					Country=$User.Country
 				}
@@ -145,44 +165,61 @@ function New-SMBOfficeDeployment {
 				$User.Login = $ReturnUser.SignInName
 				$User.Password = $DefaultPassword
 				$Inventory.Groups|where{$_.Owner -eq $User}|foreach{$_.Owner = $User}
-
+				
 				$DeploymentJob.Status.ProvisionedUsers += $User
 				$OneDriveUsers += $UserParameters.UserName
+				if(($EnableATP -eq $false) -and ($User.Licenses|where{$_.Name -eq $ATPLicenseName})){
+					$EnableATP = $true
+				}
 				
 			}
 			Write-Progress -Id 1 -Completed -Activity "Deploying 0365 Solution"
 			#write-log "Waiting some time to allow the user mailboxes to provision"
 			#Start-Sleep -Seconds 30
+			if($EnableATP){
+				# Disabled due to testing issues
+				<#write-log "At least one O365 ATP License is assigned, setting up ATP policies and rules"
+				Write-Progress -Id 1 -Activity "Deploying O365 Solution"`
+				-Status "Provisioning ATP "
+				try {
+					Enable-O365ATP -MailDomain $DefaultDomain
+				} catch {
+					write-log -type warning -message $_
+				}
+				Write-Progress -Id 1 -Completed -Activity "Deploying 0365 Solution" #>
+			}
 
 			write-log -type information -message "Provisioning Groups"
 			$i = 1
-			foreach($Group in $Inventory.Groups){
-				Write-Progress -Id 1 -Activity "Deploying O365 Solution"`
-				-Status "Provisioning Groups"`
-				-CurrentOperation "$i/$($Inventory.Groups.Count)"`
-				-PercentComplete (($i/$($Inventory.Groups.Count))*100)
-				$null = New-O365Group -GroupName $Group.Name -Type office -owner ($Group.Owner.Login.split('@')[0])
-				$DeploymentJob.Status.ProvisionedGroups += $Group
-				$i++
-			}
-			Write-Progress -Id 1 -Completed -Activity "Deploying 0365 Solution"
-			write-log "Populating Group Memberships"
-			$i = 1
-			foreach($User in $Inventory.Users){
-				Write-Progress -Id 1 -Activity "Deploying O365 Solution"`
-				-Status "Provisioning Group Memberships"`
-				-CurrentOperation "$i/$($Inventory.Users.Count)"`
-				-PercentComplete (($i/$($Inventory.Users.Count))*100)
-				foreach($Group in $User.Groups){
-					if(($Group.Owner).Login -ne $User.Login){
-						$null = Add-O365UserToGroup -UserName $User.Login -GroupName $Group.Name -Type Office
-					} else {
-						write-log -type information -message "$User is owner of the group $Group, membership creation skipped"
-					}
+			if($Inventory.Groups.Count -gt 0){
+				foreach($Group in $Inventory.Groups){
+					Write-Progress -Id 1 -Activity "Deploying O365 Solution"`
+					-Status "Provisioning Groups"`
+					-CurrentOperation "$i/$($Inventory.Groups.Count)"`
+					-PercentComplete (($i/$($Inventory.Groups.Count))*100)
+					$null = New-O365Group -GroupName $Group.Name -Type office -owner ($Group.Owner.Login.split('@')[0])
+					$DeploymentJob.Status.ProvisionedGroups += $Group
+					$i++
 				}
-				$i++
+				Write-Progress -Id 1 -Completed -Activity "Deploying 0365 Solution"
+				write-log "Populating Group Memberships"
+				$i = 1
+				foreach($User in $Inventory.Users){
+					Write-Progress -Id 1 -Activity "Deploying O365 Solution"`
+					-Status "Provisioning Group Memberships"`
+					-CurrentOperation "$i/$($Inventory.Users.Count)"`
+					-PercentComplete (($i/$($Inventory.Users.Count))*100)
+					foreach($Group in $User.Groups){
+						if(($Group.Owner).Login -ne $User.Login){
+							$null = Add-O365UserToGroup -UserName $User.Login -GroupName $Group.Name -Type Office
+						} else {
+							write-log -type information -message "$User is owner of the group $Group, membership creation skipped"
+						}
+					}
+					$i++
+				}
+				Write-Progress -Id 1 -Completed -Activity "Deploying 0365 Solution"
 			}
-			Write-Progress -Id 1 -Completed -Activity "Deploying 0365 Solution"
 
 			write-log -type information -message "Provisioning Onedrives"
 			Write-Progress -Id 1 -Activity "Deploying O365 Solution"`

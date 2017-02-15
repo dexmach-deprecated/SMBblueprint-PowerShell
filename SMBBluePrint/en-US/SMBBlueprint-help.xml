@@ -208,6 +208,29 @@
 <maml:uri /></dev:type>
 <dev:defaultValue>'2012R2'</dev:defaultValue>
 </command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>NoUpdateCheck</maml:name>
+<maml:Description><maml:para>Skips the module version check when launching the command
+</maml:para>
+</maml:Description>
+<dev:type><maml:name>SwitchParameter</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>False</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>StorageType</maml:name>
+<maml:Description><maml:para>Specifies the storage type to use for the virtual machines that are deployed
+</maml:para>
+</maml:Description>
+<command:parameterValueGroup><command:parameterValue required="false" variableLength="false">Standard_LRS</command:parameterValue>
+<command:parameterValue required="false" variableLength="false">Standard_ZRS</command:parameterValue>
+<command:parameterValue required="false" variableLength="false">Standard_GRS</command:parameterValue>
+<command:parameterValue required="false" variableLength="false">Standard_RAGRS</command:parameterValue>
+<command:parameterValue required="false" variableLength="false">Premium_LRS</command:parameterValue>
+</command:parameterValueGroup>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
 </command:syntaxItem>
 <command:syntaxItem><maml:name>New-SMBAzureDeployment</maml:name>
 <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>AdditionalSQLInstanceSize</maml:name>
@@ -403,6 +426,29 @@
 <maml:uri /></dev:type>
 <dev:defaultValue>'2012R2'</dev:defaultValue>
 </command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>NoUpdateCheck</maml:name>
+<maml:Description><maml:para>Skips the module version check when launching the command
+</maml:para>
+</maml:Description>
+<dev:type><maml:name>SwitchParameter</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>False</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>StorageType</maml:name>
+<maml:Description><maml:para>Specifies the storage type to use for the virtual machines that are deployed
+</maml:para>
+</maml:Description>
+<command:parameterValueGroup><command:parameterValue required="false" variableLength="false">Standard_LRS</command:parameterValue>
+<command:parameterValue required="false" variableLength="false">Standard_ZRS</command:parameterValue>
+<command:parameterValue required="false" variableLength="false">Standard_GRS</command:parameterValue>
+<command:parameterValue required="false" variableLength="false">Standard_RAGRS</command:parameterValue>
+<command:parameterValue required="false" variableLength="false">Premium_LRS</command:parameterValue>
+</command:parameterValueGroup>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
 </command:syntaxItem>
 </command:syntax>
 <command:parameters><command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>AdditionalSQLInstanceSize</maml:name>
@@ -584,6 +630,24 @@
 <maml:uri /></dev:type>
 <dev:defaultValue>'2012R2'</dev:defaultValue>
 </command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>NoUpdateCheck</maml:name>
+<maml:Description><maml:para>Skips the module version check when launching the command
+</maml:para>
+</maml:Description>
+<command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+<dev:type><maml:name>SwitchParameter</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>False</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>StorageType</maml:name>
+<maml:Description><maml:para>Specifies the storage type to use for the virtual machines that are deployed
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
 </command:parameters>
 <command:inputTypes><command:inputType><dev:type><maml:name>None</maml:name>
 </dev:type>
@@ -669,13 +733,13 @@
 </maml:para>
 <maml:para>* Mobile (the user's mobile phone number)
 </maml:para>
-<maml:para>* Country (the user's country, expressed as an ISO-code (https://www.iso.org/obp/ui/#search))* Groups (the group to which the user should belong)     * If the group is mentioned for the first time, the associated user will be set as owner. Subsequent users that have the same group specified will be a regular member.     * The created groups will be private Office Groups * License (the license to assign to the user, expressed as the SKU code, which can be found using get-msolaccountsku -TenantId &lt;ID of your CSP tenant&gt;)     * You can get the tenant-id's under your CSP account by connecting to your root Azure AD with 'Connect-MSOLService' and then querying the tenants with 'Get-MSOLPartnerContract -All|select DefaultDomainName,TenantId'
+<maml:para>* Country (the user's country, expressed as an ISO-code (https://www.iso.org/obp/ui/#search))* Groups (the group to which the user should belong)     * If the group is mentioned for the first time, the associated user will be set as owner. Subsequent users that have the same group specified will be a regular member.     * The created groups will be private Office Groups * Licenses (the licenses to assign to the user, expressed as the SKU code and separated by '|', which can be found using get-msolaccountsku -TenantId &lt;ID of your CSP tenant&gt;)     * You can get the tenant-id's under your CSP account by connecting to your root Azure AD with 'Connect-MSOLService' and then querying the tenants with 'Get-MSOLPartnerContract -All|select DefaultDomainName,TenantId'
 </maml:para>
 <maml:para>&gt; Example CSV: 
-First,Last,Title,DisplayName,Department,Office,Mobile,Country,Groups,License
-Jan,Van Meirvenne,Consultant,Jan.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGroup1,O365_BUSINESS_PREMIUM
-Jin,Van Meirvenne,Consultant,Jin.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGroup10,O365_BUSINESS_PREMIUM
-Jon,Van Meirvenne,Consultant,Jon.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGroup10,O365_BUSINESS_PREMIUM
+&gt;First,Last,Title,DisplayName,Department,Office,Mobile,Country,Groups,Licenses
+&gt;Jan,Van Meirvenne,Consultant,Jan.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGroup1,ADALLOM_O365|POWER_BI_STANDARD
+&gt;Jin,Van Meirvenne,Consultant,Jin.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGroup10,ADALLOM_O365|POWER_BI_STANDARD
+&gt;Jon,Van Meirvenne,Consultant,Jon.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGroup10,ADALLOM_O365|POWER_BI_STANDARD
 
 </maml:para>
 </maml:Description>
@@ -728,6 +792,14 @@ Jon,Van Meirvenne,Consultant,Jon.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGr
 <dev:type><maml:name>String</maml:name>
 <maml:uri /></dev:type>
 <dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>NoUpdateCheck</maml:name>
+<maml:Description><maml:para>Skips the module version check when launching the command
+</maml:para>
+</maml:Description>
+<dev:type><maml:name>SwitchParameter</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>False</dev:defaultValue>
 </command:parameter>
 </command:syntaxItem>
 <command:syntaxItem><maml:name>New-SMBOfficeDeployment</maml:name>
@@ -755,13 +827,13 @@ Jon,Van Meirvenne,Consultant,Jon.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGr
 </maml:para>
 <maml:para>* Mobile (the user's mobile phone number)
 </maml:para>
-<maml:para>* Country (the user's country, expressed as an ISO-code (https://www.iso.org/obp/ui/#search))* Groups (the group to which the user should belong)     * If the group is mentioned for the first time, the associated user will be set as owner. Subsequent users that have the same group specified will be a regular member.     * The created groups will be private Office Groups * License (the license to assign to the user, expressed as the SKU code, which can be found using get-msolaccountsku -TenantId &lt;ID of your CSP tenant&gt;)     * You can get the tenant-id's under your CSP account by connecting to your root Azure AD with 'Connect-MSOLService' and then querying the tenants with 'Get-MSOLPartnerContract -All|select DefaultDomainName,TenantId'
+<maml:para>* Country (the user's country, expressed as an ISO-code (https://www.iso.org/obp/ui/#search))* Groups (the group to which the user should belong)     * If the group is mentioned for the first time, the associated user will be set as owner. Subsequent users that have the same group specified will be a regular member.     * The created groups will be private Office Groups * Licenses (the licenses to assign to the user, expressed as the SKU code and separated by '|', which can be found using get-msolaccountsku -TenantId &lt;ID of your CSP tenant&gt;)     * You can get the tenant-id's under your CSP account by connecting to your root Azure AD with 'Connect-MSOLService' and then querying the tenants with 'Get-MSOLPartnerContract -All|select DefaultDomainName,TenantId'
 </maml:para>
 <maml:para>&gt; Example CSV: 
-First,Last,Title,DisplayName,Department,Office,Mobile,Country,Groups,License
-Jan,Van Meirvenne,Consultant,Jan.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGroup1,O365_BUSINESS_PREMIUM
-Jin,Van Meirvenne,Consultant,Jin.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGroup10,O365_BUSINESS_PREMIUM
-Jon,Van Meirvenne,Consultant,Jon.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGroup10,O365_BUSINESS_PREMIUM
+&gt;First,Last,Title,DisplayName,Department,Office,Mobile,Country,Groups,Licenses
+&gt;Jan,Van Meirvenne,Consultant,Jan.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGroup1,ADALLOM_O365|POWER_BI_STANDARD
+&gt;Jin,Van Meirvenne,Consultant,Jin.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGroup10,ADALLOM_O365|POWER_BI_STANDARD
+&gt;Jon,Van Meirvenne,Consultant,Jon.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGroup10,ADALLOM_O365|POWER_BI_STANDARD
 
 </maml:para>
 </maml:Description>
@@ -815,6 +887,14 @@ Jon,Van Meirvenne,Consultant,Jon.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGr
 <maml:uri /></dev:type>
 <dev:defaultValue>None</dev:defaultValue>
 </command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>NoUpdateCheck</maml:name>
+<maml:Description><maml:para>Skips the module version check when launching the command
+</maml:para>
+</maml:Description>
+<dev:type><maml:name>SwitchParameter</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>False</dev:defaultValue>
+</command:parameter>
 </command:syntaxItem>
 </command:syntax>
 <command:parameters><command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>Credential</maml:name>
@@ -841,13 +921,13 @@ Jon,Van Meirvenne,Consultant,Jon.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGr
 </maml:para>
 <maml:para>* Mobile (the user's mobile phone number)
 </maml:para>
-<maml:para>* Country (the user's country, expressed as an ISO-code (https://www.iso.org/obp/ui/#search))* Groups (the group to which the user should belong)     * If the group is mentioned for the first time, the associated user will be set as owner. Subsequent users that have the same group specified will be a regular member.     * The created groups will be private Office Groups * License (the license to assign to the user, expressed as the SKU code, which can be found using get-msolaccountsku -TenantId &lt;ID of your CSP tenant&gt;)     * You can get the tenant-id's under your CSP account by connecting to your root Azure AD with 'Connect-MSOLService' and then querying the tenants with 'Get-MSOLPartnerContract -All|select DefaultDomainName,TenantId'
+<maml:para>* Country (the user's country, expressed as an ISO-code (https://www.iso.org/obp/ui/#search))* Groups (the group to which the user should belong)     * If the group is mentioned for the first time, the associated user will be set as owner. Subsequent users that have the same group specified will be a regular member.     * The created groups will be private Office Groups * Licenses (the licenses to assign to the user, expressed as the SKU code and separated by '|', which can be found using get-msolaccountsku -TenantId &lt;ID of your CSP tenant&gt;)     * You can get the tenant-id's under your CSP account by connecting to your root Azure AD with 'Connect-MSOLService' and then querying the tenants with 'Get-MSOLPartnerContract -All|select DefaultDomainName,TenantId'
 </maml:para>
 <maml:para>&gt; Example CSV: 
-First,Last,Title,DisplayName,Department,Office,Mobile,Country,Groups,License
-Jan,Van Meirvenne,Consultant,Jan.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGroup1,O365_BUSINESS_PREMIUM
-Jin,Van Meirvenne,Consultant,Jin.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGroup10,O365_BUSINESS_PREMIUM
-Jon,Van Meirvenne,Consultant,Jon.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGroup10,O365_BUSINESS_PREMIUM
+&gt;First,Last,Title,DisplayName,Department,Office,Mobile,Country,Groups,Licenses
+&gt;Jan,Van Meirvenne,Consultant,Jan.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGroup1,ADALLOM_O365|POWER_BI_STANDARD
+&gt;Jin,Van Meirvenne,Consultant,Jin.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGroup10,ADALLOM_O365|POWER_BI_STANDARD
+&gt;Jon,Van Meirvenne,Consultant,Jon.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGroup10,ADALLOM_O365|POWER_BI_STANDARD
 
 </maml:para>
 </maml:Description>
@@ -909,6 +989,15 @@ Jon,Van Meirvenne,Consultant,Jon.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGr
 <dev:type><maml:name>String</maml:name>
 <maml:uri /></dev:type>
 <dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>NoUpdateCheck</maml:name>
+<maml:Description><maml:para>Skips the module version check when launching the command
+</maml:para>
+</maml:Description>
+<command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+<dev:type><maml:name>SwitchParameter</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>False</dev:defaultValue>
 </command:parameter>
 </command:parameters>
 <command:inputTypes><command:inputType><dev:type><maml:name>None</maml:name>
@@ -963,9 +1052,26 @@ Jon,Van Meirvenne,Consultant,Jon.VanMeirvenne,ICT,Inovativ,32478707741,BE,TestGr
 </maml:para>
 </maml:description>
 <command:syntax><command:syntaxItem><maml:name>Start-SMBDeploymentGUI</maml:name>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>NoUpdateCheck</maml:name>
+<maml:Description><maml:para>Skips the module version check when launching the command
+</maml:para>
+</maml:Description>
+<dev:type><maml:name>SwitchParameter</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>False</dev:defaultValue>
+</command:parameter>
 </command:syntaxItem>
 </command:syntax>
-<command:parameters></command:parameters>
+<command:parameters><command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>NoUpdateCheck</maml:name>
+<maml:Description><maml:para>Skips the module version check when launching the command
+</maml:para>
+</maml:Description>
+<command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+<dev:type><maml:name>SwitchParameter</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>False</dev:defaultValue>
+</command:parameter>
+</command:parameters>
 <command:inputTypes><command:inputType><dev:type><maml:name>None</maml:name>
 </dev:type>
 <maml:description><maml:para>

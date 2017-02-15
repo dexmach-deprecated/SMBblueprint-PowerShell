@@ -17,6 +17,8 @@ function ConvertFrom-O365 {
 			
 			foreach($User in $Users){
 				# First,Last,Title,DisplayName,Department,Office,Mobile,Country,Groups,License
+			
+				
 				$CSVItem = new-object psobject -Property @{
 					First = $User.First
 					Last = $User.Last
@@ -26,7 +28,7 @@ function ConvertFrom-O365 {
 					Mobile = $User.Mobile
 					Country = $User.Country
 					Groups = if($User.Groups[0].Owner.DisplayName -eq $User.DisplayName){"*$($User.Groups[0].Name)"} else {$User.Groups[0].Name}
-					License = $User.License.Name
+					Licenses = $($User.Licenses.Name -join "|")
 					Title = $User.Title
 					
 				}

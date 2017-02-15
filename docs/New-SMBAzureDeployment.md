@@ -18,7 +18,7 @@ New-SMBAzureDeployment -Location <String> [-FallbackLocation <String>] [-AsJob] 
  -CustomerSize <String> [-AdditionalVMSize <String>] [-AdditionalSQLInstanceSize <String>] [-Backup <String>]
  [-VPN <String>] [-Management <String>] [-OS <String>] [-SysAdminPassword <String>] -Credential <PSCredential>
  -TenantDomain <String> [-SubscriptionId <String>] [-SubscriptionName <String>] [-ResourceGroupPrefix <String>]
- [-Log <String>] [<CommonParameters>]
+ [-NoUpdateCheck] [-StorageType <String>] [-Log <String>] [<CommonParameters>]
 ```
 
 ### AzureTenantId
@@ -27,7 +27,7 @@ New-SMBAzureDeployment -Location <String> [-FallbackLocation <String>] [-AsJob] 
  -CustomerSize <String> [-AdditionalVMSize <String>] [-AdditionalSQLInstanceSize <String>] [-Backup <String>]
  [-VPN <String>] [-Management <String>] [-OS <String>] [-SysAdminPassword <String>] -Credential <PSCredential>
  -TenantId <String> [-SubscriptionId <String>] [-SubscriptionName <String>] [-ResourceGroupPrefix <String>]
- [-Log <String>] [<CommonParameters>]
+ [-NoUpdateCheck] [-StorageType <String>] [-Log <String>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -307,7 +307,8 @@ When this parameter is omitted and the primary region is not supported, you will
 Type: String
 Parameter Sets: (All)
 Aliases: 
-Accepted Values: westeurope, southeastasia, australiasoutheast
+Accepted values: westeurope, southeastasia, australiasoutheast
+
 Required: False
 Position: Named
 Default value: None
@@ -352,10 +353,42 @@ Determines the used operating system for the VM deployments. Currently '2012R2' 
 Type: String
 Parameter Sets: (All)
 Aliases: 
-Accepted Values: '2012R2','2016'
+Accepted values: '2012R2', '2016'
+
 Required: False
 Position: Named
 Default value: '2012R2'
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -NoUpdateCheck
+Skips the module version check when launching the command
+
+```yaml
+Type: SwitchParameter
+Parameter Sets: (All)
+Aliases: 
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -StorageType
+Specifies the storage type to use for the virtual machines that are deployed
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+Accepted Values: Standard_LRS, Standard_ZRS, Standard_GRS, Standard_RAGRS, Premium_LRS
+
+Required: False
+Position: Named
+Default value: None
 Accept pipeline input: False
 Accept wildcard characters: False
 ```

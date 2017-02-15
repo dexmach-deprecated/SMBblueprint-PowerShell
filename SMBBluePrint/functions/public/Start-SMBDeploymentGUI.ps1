@@ -1,8 +1,14 @@
 Function Start-SMBDeploymentGUI {
 	[CmdletBinding()]
-	param()  
+	param(
+		[Parameter()]
+		[switch] $NoUpdateCheck
+	)  
 	$Log = Start-Log  
 	$PSDefaultParameterValues = @{"Write-Log:Log"="$Log"}
+	if(!$PSBoundParameters.ContainsKey('NoUpdateCheck')){
+		Test-ModuleVersion -ModuleName SMBBluePrint
+	}
 	$script:SyncHash = [hashtable]::Synchronized(@{})
 	# Create empty view-model
 	$SyncHash.ViewModel = new-object psobject -Property @{
@@ -31,6 +37,7 @@ Function Start-SMBDeploymentGUI {
 		FallbackAction = $null
 		Management = 'free'
 		OS = '2016'
+		StorageType = $null
 	}
 	write-host "Please wait while the graphical interface is being loaded"
 	if($Log -eq $null){
@@ -43,7 +50,7 @@ Function Start-SMBDeploymentGUI {
 	$SyncHash.Root = $script:Root
 	
 	$SyncHash.Log = $Log
-	$SyncHash.LogName = $LogName
+
 	
 	
 	$null = invoke-operation -log $SyncHash.Log -root $SyncHash.Root -synchash $SyncHash -code {
@@ -104,8 +111,12 @@ Function Start-SMBDeploymentGUI {
 				}
 				$Locations = $Locations|sort
 				$SyncHash.WPF_Cmb_PrimaryLocation.ItemsSource = $Locations
-				$SyncHash.WPF_Cmb_Licenses.ItemsSource = $SyncHash.ViewModel.Licenses.Values
-				$SyncHash.WPF_Cmb_Licenses.SelectedIndex = 0
+				# Some tinkering to get the license selection box working properly
+				$array = new-object Object[] $SyncHash.ViewModel.Licenses.Values.Count
+				$SyncHash.ViewModel.Licenses.Values.CopyTo($array,0)
+				$SyncHash.WPF_Lst_Licenses.ItemsSource = $array
+				
+				#$SyncHash.WPF_Lst_Licenses.SelectedIndex = 0
                 $SyncHash.ViewModel.MailDomain = (Get-MsolDomain -TenantId $Selectedtenant.Id|where{$_.IsDefault -eq $true}).Name
                 ### Debug Code:
                 $SyncHash.WPF_Txt_Mail.IsReadOnly = $false
@@ -115,8 +126,15 @@ Function Start-SMBDeploymentGUI {
 				$SyncHash.GUI.Dispatcher.Invoke(
 				"Render",
 				[action]{
-					$SyncHash.WPF_Btn_AzureLink.Visibility = [System.Windows.Visibility]::Visible
-					$SyncHash.WPF_Btn_O365Link.Visibility = [System.Windows.Visibility]::Visible
+					$SyncHash.WPF_Btn_O365Link.Visibility = [System.Windows.Visibility]::Collapsed
+					$SyncHash.WPF_Btn_AzureLink.Visibility = [System.Windows.Visibility]::Collapsed
+					if($SelectedTenant.Type.ToString() -in 'Azure','All'){
+						$SyncHash.WPF_Btn_AzureLink.Visibility = [System.Windows.Visibility]::Visible
+					}
+					if($SelectedTenant.Type.ToString() -in 'Office','All'){
+						$SyncHash.WPF_Btn_O365Link.Visibility = [System.Windows.Visibility]::Visible
+					}
+					
 				}
 				)
 				
@@ -172,7 +190,7 @@ Function Start-SMBDeploymentGUI {
 							
 							$SyncHash.WPF_Lbl_Title.Text = "Retrieving Tenant Information"}
 						)
-						Add-AzureRmAccount -Credential $SyncHash.ViewModel.AzureCredential
+						<#Add-AzureRmAccount -Credential $SyncHash.ViewModel.AzureCredential
 						if($? -eq $false){
 							throw $Error[0]
 						}
@@ -196,7 +214,11 @@ Function Start-SMBDeploymentGUI {
 							$TenantObject.Name = $Tenant.DefaultDomainName
 							$SyncHash.ViewModel.Tenants += $TenantObject
 							write-log -message "Found CSP Tenant $($TenantObject.Name)" -type debug
-						}
+						} #>
+						$null = Connect-MSOLService -Credential $SyncHash.ViewModel.AzureCredential
+						$null = Login-AzureRmAccount -Credential $SyncHash.ViewModel.AzureCredential
+						$SyncHash.ViewModel.Tenants = @($(Get-Tenant -All))
+
 						
 						
 						$SyncHash.GUI.Dispatcher.Invoke(
@@ -305,6 +327,11 @@ Function Start-SMBDeploymentGUI {
 					invoke-message "Not all parameters are present for deployment"
 					return
 				}
+				$SyncHash.ViewModel.Password = $SyncHash.WPF_Txt_OfficePassword.Password
+				if((Test-AADPasswordComplexity -MinimumLength 8 -Password $SyncHash.ViewModel.Password) -eq $false){
+					invoke-message "Password does not meet complexity requirements"
+					return
+				}
 				
 				$Overview =  `
 				"The deployment will be started with the following parameters:`r`n" +`
@@ -334,6 +361,7 @@ Function Start-SMBDeploymentGUI {
 						SyncHash= $SyncHash
 						Log=$Log
                         MailDomain = $SyncHash.ViewModel.MailDomain
+						NoUpdateCheck = $true
 					}
 					$SyncHash.ViewModel.CommandName = "New-SMBOfficeDeployment"
 					$SyncHash.ViewModel.CommandParameters = $Parameters
@@ -475,6 +503,10 @@ Function Start-SMBDeploymentGUI {
 				$SyncHash.ViewModel.OS = $SyncHash.WPF_Cmb_OS.SelectedItem.Tag
 				Write-Log -Message "OS set to $($SyncHash.ViewModel.OS)"
 			})
+			$SyncHash.WPF_Cmb_StorageType.Add_SelectionChanged({
+				$SyncHash.ViewModel.StorageType = $SyncHash.WPF_Cmb_StorageType.SelectedItem.Tag
+				Write-Log -Message "Storage Type set to $($SyncHash.ViewModel.StorageType)"
+			})
 
 			$SyncHash.WPF_btn_Deploy.Add_Click(
 			{
@@ -501,6 +533,12 @@ Function Start-SMBDeploymentGUI {
 					invoke-message -message "'Microsoft' can not be a part of the customer name, please choose another customer name"
 					return
 				}
+				$SyncHash.ViewModel.Password = $SyncHash.WPF_Txt_AzurePassword.Password
+				if((Test-AADPasswordComplexity -MinimumLength 12 -Password $SyncHash.ViewModel.Password) -eq $false){
+					invoke-message "Password does not meet complexity requirements"
+					return
+				}
+				$SyncHash.ViewModel.StorageType = $SyncHash.WPF_Cmb_StorageType.SelectedItem.Tag
 				
 				
 				$Overview = `
@@ -518,6 +556,7 @@ Function Start-SMBDeploymentGUI {
 				"Location: $($SyncHash.viewModel.AzureLocation)`r`n" +
 				"Fallback Action: $($SyncHash.viewModel.FallbackAction)`r`n" +
 				"OS: $($SyncHash.viewModel.OS)`r`n" +
+				"OS: $($SyncHash.viewModel.StorageType)`r`n" +
 				"`r`n" +`
 				"Please note this credential for use with the solution:`r`n" +`
 				"User: sysadmin`r`n" +`
@@ -544,6 +583,8 @@ Function Start-SMBDeploymentGUI {
 						Location=$SyncHash.ViewModel.AzureLocation
 						Management=$SyncHash.ViewModel.Management
 						OS=$SyncHash.ViewModel.OS
+						StorageType = $SyncHash.ViewModel.StorageType
+						NoUpdateCheck = $true
 
 					}
 					if($SyncHash.ViewModel.FallbackAction -ne $null){
@@ -627,7 +668,13 @@ Function Start-SMBDeploymentGUI {
 					$User.Office = $SyncHash.WPF_Txt_Office.Text
 					$User.Mobile = $SyncHash.WPF_Txt_Mobile.Text
 					$User.DisplayName = [Regex]::Replace($User.First,'[^a-zA-Z0-9]', '') + "." + [Regex]::Replace($User.Last,'[^a-zA-Z0-9]', '')
-					$User.License = [License]$SyncHash.WPF_Cmb_Licenses.SelectedItem
+					
+					
+					ForEach($Item in $SyncHash.WPF_Lst_Licenses.SelectedItems){
+			
+						$User.Licenses.Add([License]$Item)
+					}
+					
 					if(($SyncHash.WPF_Cmb_Groups.SelectedItem -eq $null) -and ([string]::IsNullOrEmpty($SyncHash.WPF_Cmb_Groups.Text) -ne $true)){
 						if($Group = ($SyncHash.ViewModel.Groups.Where{$_.Name -eq $SyncHash.WPF_Cmb_Groups.Text})){
 							$User.Groups.Add($Group)
@@ -782,6 +829,48 @@ Function Start-SMBDeploymentGUI {
 
 			)
 
+			$SyncHash.WPF_Btn_ShowAzurePassword.Add_Click({
+				$SyncHash.GUI.Dispatcher.Invoke(
+				"Render",
+				[action]{
+					if($SyncHash.WPF_Btn_ShowAzurePassword.Content -eq "Show"){
+						$SyncHash.WPF_Txt_AzurePasswordVisible.Text = $SyncHash.WPF_Txt_AzurePassword.Password
+						$SyncHash.WPF_Txt_AzurePasswordVisible.Visibility = [System.Windows.Visibility]::visible
+						$SyncHash.WPF_Txt_AzurePassword.Visibility = [System.Windows.Visibility]::collapsed
+						$SyncHash.WPF_Btn_ShowAzurePassword.Content = "Hide"
+					} else {
+						$SyncHash.WPF_Txt_AzurePassword.Password = $SyncHash.WPF_Txt_AzurePasswordVisible.Text
+						$SyncHash.WPF_Txt_AzurePasswordVisible.Text = ""
+						$SyncHash.WPF_Txt_AzurePasswordVisible.Visibility = [System.Windows.Visibility]::collapsed
+						$SyncHash.WPF_Txt_AzurePassword.Visibility = [System.Windows.Visibility]::visible
+						$SyncHash.WPF_Btn_ShowAzurePassword.Content = "Show"
+					}
+					
+				}) 
+				
+			})
+
+			$SyncHash.WPF_Btn_ShowOfficePassword.Add_Click({
+				$SyncHash.GUI.Dispatcher.Invoke(
+				"Render",
+				[action]{
+					if($SyncHash.WPF_Btn_ShowOfficePassword.Content -eq "Show"){
+						$SyncHash.WPF_Txt_OfficePasswordVisible.Text = $SyncHash.WPF_Txt_OfficePassword.Password
+						$SyncHash.WPF_Txt_OfficePasswordVisible.Visibility = [System.Windows.Visibility]::visible
+						$SyncHash.WPF_Txt_OfficePassword.Visibility = [System.Windows.Visibility]::collapsed
+						$SyncHash.WPF_Btn_ShowOfficePassword.Content = "Hide"
+					} else {
+						$SyncHash.WPF_Txt_OfficePassword.Password = $SyncHash.WPF_Txt_OfficePasswordVisible.Text
+						$SyncHash.WPF_Txt_OfficePasswordVisible.Visibility = [System.Windows.Visibility]::collapsed
+						$SyncHash.WPF_Txt_OfficePassword.Visibility = [System.Windows.Visibility]::visible
+						$SyncHash.WPF_Btn_ShowOfficePassword.Content = "Show"
+					}
+					
+				}) 
+				
+			})
+			
+
 			$SyncHash.WPF_btnImportCSV.Add_Click({
 				[System.Windows.Forms.OpenFileDialog] $OpenFileDialog = new-object System.Windows.Forms.OpenFileDialog
 				$OpenFileDialog.Filter = "CSV-File (.csv)|*.csv"
@@ -893,6 +982,8 @@ Function Start-SMBDeploymentGUI {
 			$SyncHash.GUI.DataContext = $SyncHash.ViewModel
 			$SyncHash.WPF_Cmb_Country.Items.Clear()
 			$SyncHash.WPF_Cmb_Country.ItemsSource = Get-Country
+			$SyncHash.WPF_Txt_OfficePassword.Password = $SyncHash.ViewModel.Password
+			$SyncHash.WPF_Txt_AzurePassword.Password = $SyncHash.ViewModel.Password
 			
 			$SyncHash.GUI.ShowDialog()
 			

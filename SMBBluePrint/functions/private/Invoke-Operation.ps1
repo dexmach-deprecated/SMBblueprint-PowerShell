@@ -77,6 +77,7 @@ function Invoke-Operation {
                 $PSDefaultParameterValues = @{"Write-Log:Log"="$Log"}
                   #  . $SyncHash.ClassFunction
                     Register-Classes
+                    Set-ModuleVariable
                     
                     }
                 )

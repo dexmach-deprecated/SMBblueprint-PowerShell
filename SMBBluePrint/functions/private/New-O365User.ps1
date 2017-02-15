@@ -30,11 +30,11 @@ function New-O365User
     
         [string]$password,
 
-        [Parameter(Mandatory=$true,
+        [Parameter(
                    ValueFromPipelineByPropertyName=$true)]
-        [ValidateNotNullOrEmpty()]
+       # [ValidateNotNullOrEmpty()]
      
-        [string]$license,
+        [string[]]$license,
 
  [Parameter(Mandatory=$true,
                    ValueFromPipelineByPropertyName=$true)]
@@ -65,15 +65,29 @@ function New-O365User
                 $newuser = $null
                 while($newuser -eq $null){
 
-                    $newuser = New-Msoluser -DisplayName $username -UserPrincipalName $username -FirstName $firstname -lastname $lastname -Title $title -Password $password -MobilePhone $mobilephone -Country $country -LicenseAssignment $license -UsageLocation $country
+                    $newuser = New-Msoluser -DisplayName $username -UserPrincipalName $username -FirstName $firstname -lastname $lastname -Title $title -Password $password -MobilePhone $mobilephone -Country $country -UsageLocation $country
                     if($? -eq $false){
                         throw $Error[0]
                     }
+                    if($license){
+                    foreach($Item in $license){
+                        try {
+                            $null = Set-MsolUserLicense -UserPrincipalName $Username -AddLicenses $Item
+                            if($? -eq $false){
+                                throw $Error[0]
+                            }
+                        } catch {
+                            write-log -type warning -message "Could not apply license '$Item' to user '$username': $_"
+                        } 
+                    }
+                    }
+                    }
+                    
                 }
                 write-log -Message "User $UserName created"
                 $newuser
                 
-            }
+            
 
 
         } 

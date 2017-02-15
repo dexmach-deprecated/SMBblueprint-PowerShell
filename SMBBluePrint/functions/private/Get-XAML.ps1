@@ -248,7 +248,7 @@ function Get-XAML {
                             <Grid Name="Grd_UserInput">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="80" />
-                                    <ColumnDefinition Width="160" />
+                                    <ColumnDefinition Width="200" />
                                 </Grid.ColumnDefinitions>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="30" />
@@ -259,7 +259,7 @@ function Get-XAML {
                                     <RowDefinition Height="30"  />
                                     <RowDefinition Height="30"  />
                                     <RowDefinition Height="30"  />
-                                    <RowDefinition Height="30"  />
+                                    <RowDefinition Height="80"  />
                                     <RowDefinition Height="40"  />
                                 </Grid.RowDefinitions>
 
@@ -271,7 +271,7 @@ function Get-XAML {
                                 <Label Grid.Column="0" Grid.Row="5" VerticalAlignment="Center" >Mobile</Label>
                                 <Label Grid.Column="0" Grid.Row="6" VerticalAlignment="Center" >Country</Label>
                                 <Label Grid.Column="0" Grid.Row="7" VerticalAlignment="Center" >Group</Label>
-                                <Label Grid.Column="0" Grid.Row="8" VerticalAlignment="Center" >License</Label>
+                                <Label Grid.Column="0" Grid.Row="8" VerticalAlignment="Center" >Licenses</Label>
                                 <TextBox Grid.Column="1" Grid.Row="0" Name="Txt_FirstName" VerticalAlignment="Center" HorizontalAlignment="Left" Width="150"></TextBox>
                                 <TextBox Grid.Column="1" Grid.Row="1"  VerticalAlignment="Center" HorizontalAlignment="Left" Name="Txt_LastName" Width="150"></TextBox>
                                 <TextBox Grid.Column="1" Grid.Row="2"   VerticalAlignment="Center" HorizontalAlignment="Left" Name="Txt_Function" Width="150"></TextBox>
@@ -286,7 +286,14 @@ function Get-XAML {
                                 <ComboBox ItemsSource="{Binding Path=DataContext.Groups,RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=Window}}" IsEditable="True" TextSearch.TextPath="Name" Grid.Column="1" Grid.Row="7" VerticalAlignment="Center" HorizontalAlignment="Left" Name="Cmb_Groups" Width="150">
 
                                 </ComboBox>
-                                <ComboBox Grid.Column="1" Grid.Row="8" VerticalAlignment="Center" HorizontalAlignment="Left" Name="Cmb_Licenses" Width="150" />
+                                <ListBox Grid.Column="1" Grid.Row="8" VerticalAlignment="Stretch" Width="Auto" Height="Auto" SelectionMode="Multiple" HorizontalAlignment="Stretch" Name="Lst_Licenses" Margin="5,5,-5,35" Grid.RowSpan="2">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <CheckBox Name="CheckBoxZone" IsChecked="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}}, Path=IsSelected}" Content="{Binding Path=.}" Tag="{Binding Path=.}" Margin="0,5,0,0"/>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+
                                 <Button Grid.ColumnSpan="2" Grid.Column="0" Grid.Row="9" VerticalAlignment="Top" HorizontalAlignment="Center" Name="Btn_AddUser" Height="20" Width="50" Background="#FF8B97A2" Foreground="White">Add</Button>
                             </Grid>
 
@@ -298,11 +305,11 @@ function Get-XAML {
                                 </Grid.ColumnDefinitions>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
+                                    <!--    <RowDefinition Height="Auto" /> -->
                                 </Grid.RowDefinitions>
                                 <DataGrid Grid.Column="0" Grid.Row="0" Name="UserGrid" ItemsSource="{Binding Path=Users,UpdateSourceTrigger=PropertyChanged,Mode=OneWay}" 
-                                      IsReadOnly="True" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" VerticalAlignment="Top"
-                                      Height="200" Width="800">
+                                      IsReadOnly="True" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                                       Width="800" Height="360">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="First Name" Width="80" Binding="{Binding Path=First}" />
                                         <DataGridTextColumn Header="Last Name" Width="100" Binding="{Binding Path=Last}" />
@@ -312,7 +319,7 @@ function Get-XAML {
                                         <DataGridTextColumn Header="Office" Width="100" Binding="{Binding Path=Office}" />
                                         <DataGridTextColumn Header="Mobile" Width="100" Binding="{Binding Path=Mobile}" />
                                         <DataGridTextColumn Header="Country" Width="60" Binding="{Binding Path=Country}" />
-                                        <DataGridTextColumn Header="License" Width="100" Binding="{Binding Path=License}" />
+                                        <DataGridTextColumn Header="License" Width="100" Binding="{Binding Path=Licenses}" />
                                         <DataGridTextColumn Header="Group" Width="100" Binding="{Binding Path=Groups[0]}" />
 
 
@@ -328,11 +335,17 @@ function Get-XAML {
                             </Grid>
                         </StackPanel>
                     </GroupBox>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <TextBlock VerticalAlignment="Center">Mail Suffix:</TextBlock>
-                        <TextBox IsReadOnly="True" Name="Txt_Mail" Width="300" VerticalAlignment="Center" />
-                        <Button Width="200" Height="50" Name="Btn_OfficeDeploy" Foreground="White" FontSize="20" Background="#FF24BE43">Provision Office 365</Button>
-                    </StackPanel>
+                    <GroupBox Header="Execute">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+                            <TextBlock VerticalAlignment="Center" Margin="0,0,10,0">Initial User Password:</TextBlock>
+                            <PasswordBox VerticalAlignment="Center" Width="150" Margin="0,0,0,0" Name="Txt_OfficePassword"></PasswordBox>
+                            <TextBox VerticalAlignment="Center" Width="150" Margin="0,0,0,0" Name="Txt_OfficePasswordVisible" IsReadOnly="True"  Visibility="Collapsed"></TextBox>
+                            <Button Name="Btn_ShowOfficePassword" VerticalAlignment="Center" Margin="0">Show</Button>
+                            <TextBlock VerticalAlignment="Center" Margin="20,0,0,0">Mail Suffix:</TextBlock>
+                            <TextBox IsReadOnly="True" Name="Txt_Mail"  Width="200" VerticalAlignment="Center" />
+                            <Button Name="Btn_OfficeDeploy" HorizontalAlignment="Right" Foreground="White" FontWeight="Bold" Background="#FF24BE43">Provision Office 365</Button>
+                        </StackPanel>
+                    </GroupBox>
                 </StackPanel>
             </TabItem>
             <TabItem Name="Tab_Azure" Header="Azure">
@@ -356,7 +369,7 @@ function Get-XAML {
                         </GroupBox>
                         <GroupBox Header="2. Scenario Selection" >
                             <Grid>
-                                <StackPanel VerticalAlignment="Center">
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Stretch">
 
                                     <RadioButton Name="Rad_Small" Tag="small" FontSize="20" IsChecked="True" VerticalAlignment="Center" VerticalContentAlignment="Center">Small</RadioButton>
                                     <RadioButton Name="Rad_Medium" Tag="medium"  FontSize="20" VerticalAlignment="Center" VerticalContentAlignment="Center">Medium</RadioButton>
@@ -373,10 +386,10 @@ function Get-XAML {
                         </GroupBox>
                         <GroupBox Header="3. Additional Options">
 
-                            <Grid>
+                            <Grid HorizontalAlignment="Left">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="200" />
-                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="200"/>
 
                                 </Grid.ColumnDefinitions>
                                 <Grid.RowDefinitions>
@@ -385,38 +398,50 @@ function Get-XAML {
                                     <RowDefinition />
                                     <RowDefinition />
                                     <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
                                 </Grid.RowDefinitions>
 
-                                <Label Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2">OS:</Label>
-                                <ComboBox Grid.Column="2" Grid.Row="0" Name="Cmb_OS">
+                                <Label Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2">Storage Type:</Label>
+                                <ComboBox Grid.Column="2" Grid.Row="0" Name="Cmb_StorageType" Width="200">
+                                    <ComboBoxItem IsSelected="True" Tag="Standard_LRS">Locally Redundant (standard)</ComboBoxItem>
+                                    <ComboBoxItem Tag="Standard_ZRS">Zone-Redundant (standard)</ComboBoxItem>
+                                    <ComboBoxItem Tag="Standard_GRS">Geo-Redundant (standard)</ComboBoxItem>
+                                    <ComboBoxItem Tag="Standard_RAGRS">Read-Access Geo-Redundant (standard)</ComboBoxItem>
+                                    <ComboBoxItem Tag="Premium_LRS">Locally Redundant (premium)</ComboBoxItem>
+
+                                </ComboBox>
+
+                                <Label Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2">OS:</Label>
+                                <ComboBox Grid.Column="2" Grid.Row="1" Name="Cmb_OS">
                                     <ComboBoxItem Tag="2016" IsSelected="True">2016</ComboBoxItem>
                                     <ComboBoxItem Tag="2012R2">2012R2</ComboBoxItem>
                                 </ComboBox>
 
 
-                                <Label Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2">Provision additional VM:</Label>
-                                <ComboBox Grid.Column="2" Grid.Row="1" Name="Cmb_ExtraVMSize">
+                                <Label Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2">Provision additional VM:</Label>
+                                <ComboBox Grid.Column="2" Grid.Row="2" Name="Cmb_ExtraVMSize">
                                     <ComboBoxItem Tag="none" IsSelected="True">No</ComboBoxItem>
                                     <ComboBoxItem Tag="small">Small</ComboBoxItem>
                                     <ComboBoxItem Tag="medium">Medium</ComboBoxItem>
                                 </ComboBox>
 
 
-                                <Label Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2">Provision SQL SaaS:</Label>
-                                <ComboBox Grid.Column="2" Grid.Row="2" Name="Cmb_ExtraSQLSize">
+                                <Label Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="3">Provision SQL SaaS:</Label>
+                                <ComboBox Grid.Column="2" Grid.Row="3" Name="Cmb_ExtraSQLSize">
                                     <ComboBoxItem Tag="none" IsSelected="True">No</ComboBoxItem>
                                     <ComboBoxItem Tag="small">Yes</ComboBoxItem>
 
                                 </ComboBox>
 
-                                <Label Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2">Provision Azure Backup Service:</Label>
-                                <ComboBox Grid.Column="2" Grid.Row="3" Name="Cmb_Backup">
+                                <Label Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2">Provision Azure Backup Service:</Label>
+                                <ComboBox Grid.Column="2" Grid.Row="4" Name="Cmb_Backup">
                                     <ComboBoxItem Tag="none" IsSelected="True">No</ComboBoxItem>
                                     <ComboBoxItem Tag="standard">Yes</ComboBoxItem>
 
                                 </ComboBox>
-                                <Label Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2">Provision VPN:</Label>
-                                <ComboBox Grid.Column="2" Grid.Row="4" Name="Cmb_VPN">
+                                <Label Grid.Column="0" Grid.Row="5" Grid.ColumnSpan="2">Provision VPN:</Label>
+                                <ComboBox Grid.Column="2" Grid.Row="5" Name="Cmb_VPN">
                                     <ComboBoxItem Tag="none" IsSelected="True">No</ComboBoxItem>
                                     <ComboBoxItem Tag="basic">Yes</ComboBoxItem>
 
@@ -448,22 +473,25 @@ function Get-XAML {
                                     Please select a fallback action:</TextBlock>
                                     </Label>
                                     <ComboBox Name="Cmb_FallbackAction" Width="300" VerticalAlignment="Center" HorizontalAlignment="Center">
-                                       <!-- <ComboBoxItem Tag="none" IsSelected="True">Continue deployment without these services</ComboBoxItem> -->
+                                        <!-- <ComboBoxItem Tag="none" IsSelected="True">Continue deployment without these services</ComboBoxItem> -->
                                         <ComboBoxItem Tag="westeurope" IsSelected="True">Deploy impacted services to West-Europe</ComboBoxItem>
                                         <ComboBoxItem Tag="southeastasia">Deploy impacted services to SouthEast-Asia</ComboBoxItem>
                                         <ComboBoxItem Tag="australiasoutheast">Deploy impacted services to Australia-SouthEast</ComboBoxItem>
 
                                     </ComboBox>
                                 </StackPanel>
-                                
+
                             </StackPanel>
                         </GroupBox>
                         <GroupBox Grid.Row="1" Header="5. Execute" >
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
-                               
-                                <Label VerticalAlignment="Center">Customer Name</Label>
+                                <Label VerticalAlignment="Center">Admin Password:</Label>
+                                <PasswordBox VerticalAlignment="Center" Width="150" Name="Txt_AzurePassword" />
+                                <TextBox VerticalAlignment="Center" Width="150" Name="Txt_AzurePasswordVisible"  Visibility="Collapsed" IsReadOnly="True"></TextBox>
+                                <Button Name="Btn_ShowAzurePassword" Margin="0" VerticalAlignment="Center">Show</Button>
+                                <Label VerticalAlignment="Center" Margin="20,0,0,0">Customer Name:</Label>
                                 <TextBox VerticalAlignment="Center" Name="Txt_Customer" Width="100" />
-                                <Button Name="btn_Deploy" VerticalAlignment="Center" HorizontalAlignment="Center" Height="30" Width="100" Background="#FF24BE43">Deploy Solution</Button>
+                                <Button Name="btn_Deploy" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"   Background="#FF24BE43">Provision Azure</Button>
                             </StackPanel>
                         </GroupBox>
 
@@ -545,9 +573,6 @@ function Get-XAML {
     </Grid>
 
 </Window>
-
-
-
 "@
     }
     return $xaml.GUI.Replace("D:\OneDrive - Inovativ\Projects\Microsoft\SBS\dev\GUI\src\","$script:root\gui\")
