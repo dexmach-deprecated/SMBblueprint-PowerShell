@@ -19,7 +19,6 @@
     FunctionsToExport = '*'
 
     RequiredModules = @(
-#@{ModuleName="Microsoft.Online.SharePoint.PowerShell";ModuleVersion="16.0.5806.0";Guid="adedde5f-e77b-4682-ab3d-a4cb4ff79b83"},
 @{ModuleName="AzureRM.Profile";ModuleVersion="2.5.0";Guid="342714fc-4009-4863-8afb-a9067e3db04b"},
 @{ModuleName="AzureRM.Resources";ModuleVersion="2.5.0";Guid="ab3ca893-26fe-44b0-bd3c-8933df144d7b"},
 @{ModuleName="AzureAD";ModuleVersion="2.0.0.55";Guid="d60c0004-962d-4dfb-8d28-5707572ffd00"},
