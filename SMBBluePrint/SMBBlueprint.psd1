@@ -2,7 +2,7 @@
 
     RootModule = 'SMBBlueprint.psm1';
 
-    ModuleVersion = '8.0.0.1';
+    ModuleVersion = '8.1.0.0';
 
     GUID = '83bc0698-c6b4-486a-a8e5-5e585038928d';
 
@@ -19,11 +19,11 @@
     FunctionsToExport = '*'
 
     RequiredModules = @(
-@{ModuleName="Microsoft.Online.SharePoint.PowerShell";ModuleVersion="16.0.5806.0";Guid="adedde5f-e77b-4682-ab3d-a4cb4ff79b83"},
-@{ModuleName="AzureRM.Profile";ModuleVersion="1.0.11";Guid="342714fc-4009-4863-8afb-a9067e3db04b"},
-@{ModuleName="AzureRM.Resources";ModuleVersion="1.0.11";Guid="ab3ca893-26fe-44b0-bd3c-8933df144d7b"},
-@{ModuleName="MSOnline";ModuleVersion="1.0";Guid="d162594e-d7aa-42be-9884-84928d3f7acf"},
-@{ModuleName="AzureRM.Network";ModuleVersion="3.0.0";Guid="eb75c732-e274-4a20-b502-e9958e63484a"}
+#@{ModuleName="Microsoft.Online.SharePoint.PowerShell";ModuleVersion="16.0.5806.0";Guid="adedde5f-e77b-4682-ab3d-a4cb4ff79b83"},
+@{ModuleName="AzureRM.Profile";ModuleVersion="2.5.0";Guid="342714fc-4009-4863-8afb-a9067e3db04b"},
+@{ModuleName="AzureRM.Resources";ModuleVersion="2.5.0";Guid="ab3ca893-26fe-44b0-bd3c-8933df144d7b"},
+@{ModuleName="AzureAD";ModuleVersion="2.0.0.55";Guid="d60c0004-962d-4dfb-8d28-5707572ffd00"},
+@{ModuleName="AzureRM.Network";ModuleVersion="2.5.0";Guid="eb75c732-e274-4a20-b502-e9958e63484a"}
 )
 
     PrivateData = @{

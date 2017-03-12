@@ -19,14 +19,14 @@ process{
     {
         if($Type -eq 'security'){
         
-            $groupexists = Get-MsolGroup -SearchString $GroupName
+            $groupexists = Get-AzureADGroup -SearchString $GroupName
             if ($groupexists)
                 {
                 write-log -Message "Security Group $groupname already exists" -Type Information
                 }
             Else
                 {
-                $newgroup = New-MsolGroup -DisplayName $groupname -Description $groupname
+                $newgroup = New-AzureADGroup -DisplayName $groupname -Description $groupname -SecurityEnabled $true -MailEnabled $false
                 write-log -Message "Security Group $GroupName created"
                 $newgroup
                 }

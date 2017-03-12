@@ -8,7 +8,7 @@ function Test-ModuleVersion {
 
     try{
         write-log -message "Checking if your $ModuleName module is up to date..."
-        if($CurrentModule = (Get-Module -Name $ModuleName)){
+        if(($CurrentModule = (Get-Module -Name $ModuleName)) -ne $null){
             if($TargetModule = (find-module -name $ModuleName)){
                 if($CurrentModule.Version -lt $TargetModule.Version){
                     Write-Log -Type Warning -Message "Your version of $ModuleName is out-of-date and might be unsupported (Installed: $($CurrentModule.Version) Available: $($TargetModule.Version)). Please check https://inovativ.github.io/SMBblueprint-Docs/changelog/ on how to update."
@@ -19,6 +19,6 @@ function Test-ModuleVersion {
             else { throw "Module not present on the PSGallery"}
         } else {throw "Module not present on this system"}
     } catch {
-        Write-Log -Type Warning -Message "Could not verify if the $ModuleName solution is up-to-date (Current Version: $($CurrentModule.Version): $_. Check the latest verion on https://inovativ.github.io/SMBblueprint-Docs/changelog/"
+        Write-Log -Type Warning -Message "Could not verify if the $ModuleName solution is up-to-date (Current Version: $(if($CurrentModule){$CurrentModule.Version} else {"unknown"})): $_. Check the latest verion on https://inovativ.github.io/SMBblueprint-Docs/changelog/"
     }
 }

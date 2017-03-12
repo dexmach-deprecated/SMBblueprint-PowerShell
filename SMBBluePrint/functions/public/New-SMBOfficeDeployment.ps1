@@ -67,7 +67,7 @@ function New-SMBOfficeDeployment {
 				$SyncHash.DeploymentJob = ([ref]$DeploymentJob).value
 			}
 			$DeploymentStart = get-date
-			$null = Connect-MsolService -Credential $Credential
+			$null = Connect-Cloud -Credential $Credential
 			# Hash both internal and external tenant information
 		<#	$TenantDomainHash = @{}
 			foreach($Item in (get-msolpartnercontract -all)){
@@ -78,10 +78,10 @@ function New-SMBOfficeDeployment {
 			#>
 			$Tenant = Get-Tenant -TenantId $TenantId -TenantDomain $TenantDomain
 			$TenantId = $Tenant.Id
-			
-			$PSDefaultParameterValues.Add('*-MSOL*:TenantId',$TenantId)
+			$null = Connect-Cloud -Credential $Credential -TenantId $TenantId
+			#$PSDefaultParameterValues.Add('*-MSOL*:TenantId',$TenantId)
 			$DefaultDomain = $(
-				$VerifiedDomains = Get-MsolDomain -Status Verified
+				$VerifiedDomains = Get-AzureADDomain
 				if($MailDomain){
 					if($VerifiedDomains.Name -contains $MailDomain){
 						$MailDomain
@@ -162,13 +162,13 @@ function New-SMBOfficeDeployment {
 					Country=$User.Country
 				}
 				$ReturnUser = New-O365User @UserParameters
-				$User.Login = $ReturnUser.SignInName
+				$User.Login = $ReturnUser.UserPrincipalName
 				$User.Password = $DefaultPassword
 				$Inventory.Groups|where{$_.Owner -eq $User}|foreach{$_.Owner = $User}
 				
 				$DeploymentJob.Status.ProvisionedUsers += $User
-				$OneDriveUsers += $UserParameters.UserName
-				if(($EnableATP -eq $false) -and ($User.Licenses|where{$_.Name -eq $ATPLicenseName})){
+				$OneDriveUsers += $ReturnUser.UserPrincipalName
+				if(($EnableATP -eq $false) -and ($User.Licenses|where{$_.Name -in $global:ATPLicenseName})){
 					$EnableATP = $true
 				}
 				
@@ -177,8 +177,8 @@ function New-SMBOfficeDeployment {
 			#write-log "Waiting some time to allow the user mailboxes to provision"
 			#Start-Sleep -Seconds 30
 			if($EnableATP){
-				# Disabled due to testing issues
-				<#write-log "At least one O365 ATP License is assigned, setting up ATP policies and rules"
+	
+				write-log "At least one O365 ATP License is assigned, setting up ATP policies and rules"
 				Write-Progress -Id 1 -Activity "Deploying O365 Solution"`
 				-Status "Provisioning ATP "
 				try {
@@ -186,7 +186,7 @@ function New-SMBOfficeDeployment {
 				} catch {
 					write-log -type warning -message $_
 				}
-				Write-Progress -Id 1 -Completed -Activity "Deploying 0365 Solution" #>
+				Write-Progress -Id 1 -Completed -Activity "Deploying 0365 Solution"
 			}
 
 			write-log -type information -message "Provisioning Groups"
@@ -197,7 +197,7 @@ function New-SMBOfficeDeployment {
 					-Status "Provisioning Groups"`
 					-CurrentOperation "$i/$($Inventory.Groups.Count)"`
 					-PercentComplete (($i/$($Inventory.Groups.Count))*100)
-					$null = New-O365Group -GroupName $Group.Name -Type office -owner ($Group.Owner.Login.split('@')[0])
+					$null = New-O365Group -GroupName $Group.Name -Type office -owner ($Group.Owner.Login)
 					$DeploymentJob.Status.ProvisionedGroups += $Group
 					$i++
 				}
@@ -225,7 +225,7 @@ function New-SMBOfficeDeployment {
 			Write-Progress -Id 1 -Activity "Deploying O365 Solution"`
 				-Status "Provisioning Onedrives"`
 				-PercentComplete -1
-			$OnMicrosoftDomain = ((Get-MsolDomain).where{$_.Name -like "*onmicrosoft.com"}).Name
+			$OnMicrosoftDomain = ((Get-AzureADDomain).where{$_.Name -like "*onmicrosoft.com"}).Name
 			$TenantName = $OnMicrosoftDomain.split(".")[0]
 			$TenantSPAdminUrl = "https://$($TenantName)-admin.sharepoint.com"
 			write-log -message "Using $TenantSPAdminUrl as admin url for SP online" -type verbose

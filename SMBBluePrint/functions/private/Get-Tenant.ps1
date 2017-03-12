@@ -16,17 +16,21 @@ function Get-Tenant {
     process {
         try{
             # Add Local Tenant info
-            $LocalTenantId = (Get-MsolCompanyInformation).ObjectId
-            $LocalDomain = (Get-MsolDomain|?{$_.IsDefault -eq $true}).Name
-            $null = $Tenants.Add($(New-Object Tenant|%{$_.Id = $LocalTenantId;$_.Name = $LocalDomain;$_.Default = $true;$_}))
+            # Local Office
+            $LocalTenant = Get-AzureADTenantDetail
+            $LocalTenantId = $LocalTenant.ObjectId
+            $LocalDomain = ($LocalTenant.VerifiedDomains|?{$_._Default -eq $true}).Name
+            $null = $Tenants.Add($(New-Object Tenant|%{$_.Id = $LocalTenantId;$_.Name = $LocalDomain;$_.Default = $true;$_.Type = "Office";$_}))
+            # Local Azure
+            
             # Add MSOL CSP Tenants
             try{
                 $IsCSP = $false
-                foreach($Item in (Get-MSOLPartnerContract -all -ErrorAction SilentlyContinue)){
+                foreach($Item in (Get-AzureADContract -all $true -ErrorAction SilentlyContinue)){
                     if($IsCSP -eq $false){
                         $IsCSP = $true
                     }
-                    $null = $Tenants.Add($(new-object Tenant|%{$_.Id = $Item.TenantId;$_.Name = $Item.DefaultDomainName;$_.Type = "Office";$_.Default = $false;$_}))
+                    $null = $Tenants.Add($(new-object Tenant|%{$_.Id = $Item.CustomerContextId;$_.Name = $Item.DisplayName;$_.Type = "Office";$_.Default = $false;$_}))
                 }
                 if($IsCSP -eq $false){
                     throw "NotCSP"

@@ -7,12 +7,12 @@ function Get-O365License {
 	[string]$TenantId
 	)
 	$Licenses = @{};
-	
-	(Get-MsolAccountSku -TenantId $TenantId).foreach{
+	$Usage = (Get-AzureADUser -All $true).AssignedLicenses|group -Property SkuId
+	(Get-AzureADSubscribedSku).foreach{
 		$License = New-Object License
-		$License.Id = $_.AccountSkuId
+		$License.Id = $_.SkuId
 		$License.Name = $_.SkuPartNumber
-		$License.Available = ($_.ActiveUnits - $_.ConsumedUnits)
+		$License.Available = ($_.PrePaidUnits.enabled - $($Usage.where{$_.Name -eq $License.Name}).Count)
 		$Licenses.Add($License.Name,$License)
 	}
 	$Licenses

@@ -1,8 +1,7 @@
 #Requires -Version 3
 #Requires -Module AzureRM.Profile
 #Requires -Module AzureRM.Resources
-#Requires -Module MSOnline
-#Requires -Module Microsoft.Online.SharePoint.PowerShell
+#Requires -Module AzureAD
 #Requires -Module AzureRM.Network
 [cmdletbinding()]
 param(
@@ -10,11 +9,11 @@ param(
 )
 Set-StrictMode -Version Latest
 $script:ErrorActionPreference = "stop"
-New-Variable -Name Root -Scope Script -Value $PSScriptRoot -Force
+New-Variable -Name Root -Scope Global -Value $PSScriptRoot -Force
 #$script:TemplateUrl = "https://inovativbe.blob.core.windows.net/sbstemplatedev/azuredeploy.json"
 #$script:ATPLicenseName = "ADALLOM_O365"
 
-Get-ChildItem -Path "$script:Root\Functions\" -Include '*.ps1' -Recurse |
+Get-ChildItem -Path "$global:root\Functions\" -Include '*.ps1' -Recurse |
 ForEach-Object {
     write-verbose "Registering function $($_.BaseName)"
     . $_.FullName;

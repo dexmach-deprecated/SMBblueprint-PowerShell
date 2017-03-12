@@ -4,10 +4,13 @@ function Start-Log{
 	param(
 	[Parameter()]
 	[ValidateNotNullOrEmpty()]
-	[string] $LogName = "SMBBlueprint_$(([guid]::newguid().guid)).log"
+	[string] $LogName = "SMBBlueprint_$(([guid]::newguid().guid)).log",
+	[Parameter(Mandatory=$true)]
+	[ValidateNotNullOrEmpty()]
+	[string] $InstanceId
 	)
 	# recreates the log file and sets the script parameter for use in the write-log function
-
+	$LogName = "SMbBluePrint_$($InstanceId).log"
 	$_Log = "$env:APPDATA\SMBBlueprint\logs\$($LogName)"
 # if(Test-Path -Path $script:Log){
 #     $null=remove-item -path $script:Log -force

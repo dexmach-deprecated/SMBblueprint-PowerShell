@@ -48,6 +48,9 @@ function ConvertTo-O365{
 						break;
 					}
 					"Groups" {
+						if($Item.Groups.Trim().length -eq 0){
+							break;
+						}
 						$Group = new-object Group
 						<#   if($Item.Groups.StartsWith('*')){
 							$Group.Owner = ([ref]$User).value

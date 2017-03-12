@@ -575,5 +575,5 @@ function Get-XAML {
 </Window>
 "@
     }
-    return $xaml.GUI.Replace("D:\OneDrive - Inovativ\Projects\Microsoft\SBS\dev\GUI\src\","$script:root\gui\")
+    return $xaml.GUI.Replace("D:\OneDrive - Inovativ\Projects\Microsoft\SBS\dev\GUI\src\","$global:root\gui\")
 }

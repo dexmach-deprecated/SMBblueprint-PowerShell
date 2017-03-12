@@ -19,7 +19,7 @@ Function Enable-O365ATP {
             } else {
                 Write-Log "ATP Safe Link Policy '$($SafeLinkPolicyName)' already Exists"
             }
-            if((get-safelinksrule $SafeLinkRuleName)){
+            if(!(get-safelinksrule $SafeLinkRuleName -ErrorAction SilentlyContinue)){
                 New-SafeLinksRule $SafeLinkRuleName -SafeLinksPolicy $SafeLinkPolicyName -RecipientDomainIs $MailDomain -Enabled $true
                 Write-Log "ATP Safe Link Rule '$($SafeLinkRuleName)' created"
             } else {
@@ -27,11 +27,11 @@ Function Enable-O365ATP {
             }
             
             
-            if(!(get-safeattachmentpolicy $SafeAttachmentPolicyName)){
+            if(!(get-safeattachmentpolicy $SafeAttachmentPolicyName -ErrorAction SilentlyContinue)){
                 New-SafeAttachmentPolicy $SafeAttachmentPolicyName -Enable $true -Redirect $false -Action Block
             }
 
-            if(!(get-safeattachmentrule $SafeAttachmentRuleName)){
+            if(!(get-safeattachmentrule $SafeAttachmentRuleName -ErrorAction SilentlyContinue)){
                 New-SafeAttachmentRule $SafeAttachmentRuleName -RecipientDomainIs $MailDomain -SafeAttachmentPolicy $SafeAttachmentPolicyName -Enabled $true
             }
         } catch {

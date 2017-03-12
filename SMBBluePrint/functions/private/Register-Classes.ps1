@@ -192,7 +192,7 @@ using System.Text;
 
         public override string ToString()
         {
-            return Name + " (" + Id + ") - " + Type;
+            return Name + " (" + Id + ")";
         }
 
 
