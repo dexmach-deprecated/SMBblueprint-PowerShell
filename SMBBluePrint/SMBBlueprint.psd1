@@ -19,11 +19,11 @@
     FunctionsToExport = '*'
 
     RequiredModules = @(
-@{ModuleName="AzureRM.Profile";ModuleVersion="2.5.0";Guid="342714fc-4009-4863-8afb-a9067e3db04b"},
-@{ModuleName="AzureRM.Resources";ModuleVersion="2.5.0";Guid="ab3ca893-26fe-44b0-bd3c-8933df144d7b"},
-@{ModuleName="AzureAD";ModuleVersion="2.0.0.55";Guid="d60c0004-962d-4dfb-8d28-5707572ffd00"},
-@{ModuleName="AzureRM.Network";ModuleVersion="2.5.0";Guid="eb75c732-e274-4a20-b502-e9958e63484a"}
-)
+        "AzureRM.Profile",
+        "AzureRM.Resources",
+        "AzureAD",
+        "AzureRM.Network"
+    )
 
     PrivateData = @{
 
