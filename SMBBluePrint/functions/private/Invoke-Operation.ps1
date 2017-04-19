@@ -68,13 +68,10 @@ function Invoke-Operation {
         $null = $PSInstance.AddScript({
                 $ErrorActionPreference = "Stop"
                 $global:Root = $global:SMBInstances[$InstanceId].Root
-                $SMBInstances|out-file c:\temp\text.txt
                 $global:SMBInstances = $SMBInstances
-                $global:SMBInstances|Out-File c:\temp\test_global.txt
-                $InstanceId|out-file c:\temp\instance.txt
+    
                 foreach($Item in (get-childitem -Path "$($SyncHash.Root)\functions" -Include "*.ps1" -Recurse -Force)){
                     . $Item.FullName
-                    "$($Item.FullName)"|out-file C:\temp\functions.txt -Append
                 }
                 <#    if(($Log -ne $null) -and ((test-path $Log) -ne $false)){
 			

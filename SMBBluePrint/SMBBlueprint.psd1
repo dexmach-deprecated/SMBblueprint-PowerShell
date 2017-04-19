@@ -2,7 +2,7 @@
 
     RootModule = 'SMBBlueprint.psm1';
 
-    ModuleVersion = '8.1.0.0';
+    ModuleVersion = '8.1.0.2';
 
     GUID = '83bc0698-c6b4-486a-a8e5-5e585038928d';
 
