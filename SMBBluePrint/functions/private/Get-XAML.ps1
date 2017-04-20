@@ -490,7 +490,7 @@ function Get-XAML {
                                 <TextBox VerticalAlignment="Center" Width="150" Name="Txt_AzurePasswordVisible"  Visibility="Collapsed" IsReadOnly="True"></TextBox>
                                 <Button Name="Btn_ShowAzurePassword" Margin="0" VerticalAlignment="Center">Show</Button>
                                 <Label VerticalAlignment="Center" Margin="20,0,0,0">Customer Name:</Label>
-                                <TextBox VerticalAlignment="Center" Name="Txt_Customer" Width="100" />
+                                <TextBox VerticalAlignment="Center" Name="Txt_Customer" Width="100" MaxLength="15"/>
                                 <Button Name="btn_Deploy" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"   Background="#FF24BE43">Provision Azure</Button>
                             </StackPanel>
                         </GroupBox>
