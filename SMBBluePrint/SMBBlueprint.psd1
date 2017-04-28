@@ -2,7 +2,8 @@
 
     RootModule = 'SMBBlueprint.psm1';
 
-    ModuleVersion = '8.2.0.2';
+    ModuleVersion = '8.2.0.3';
+
 
     GUID = '83bc0698-c6b4-486a-a8e5-5e585038928d';
 
@@ -19,10 +20,10 @@
     FunctionsToExport = '*'
 
     RequiredModules = @(
-        "AzureRM.Profile",
-        "AzureRM.Resources",
-        "AzureAD",
-        "AzureRM.Network"
+        @{ModuleName = "AzureRM.Profile"; RequiredVersion = "2.5.0"},
+        @{ModuleName = "AzureRM.Resources"; RequiredVersion = "3.5.0"},
+        @{ModuleName = "AzureRM.Network"; RequiredVersion = "3.4.0"},
+        @{ModuleName = "AzureAD"; RequiredVersion = "2.0.0.55"}
     )
 
     PrivateData = @{
@@ -42,16 +43,8 @@
             # IconUri = ''
 
             # ReleaseNotes of this module
-            ReleaseNotes = @(
-                '0.0.0.1: Initial preview, not production ready!',
-                '0.0.0.3: Publishing test with VSO build automation. Logging capabilities optimized. Added -MailDomain switch to Office Deployment function.',
-                '0.0.0.4: Publishing test with VSO build automation. Logging capabilities optimized. Added -MailDomain switch to Office Deployment function.',
-                '0.0.0.5: Added missing AzureRM.Network requirement. Added additional checks for Azure Public DNS reserved keyword policy',
-                '0.0.0.6: Fixed VM start/stop automation issues: Schedules are now enabled from the day after deployment / Variable<->Tag mismatch resolved / centralized the template URL in the ARM structure'
-                '0.0.0.7: Added Multi-Region / Server 2016 support'
-                '0.0.0.7: Check https://inovativ.github.io/SMBblueprint-Docs/',
-                '8.2.0.0: Check https://inovativ.github.io/SMBblueprint-Docs/'
-            )
+            ReleaseNotes = "https://inovativ.github.io/SMBblueprint-Docs/changelog"
+            
             #ExternalModuleDependencies = @('Microsoft.Online.SharePoint.PowerShell')
 
         } # End of PSData hashtable
