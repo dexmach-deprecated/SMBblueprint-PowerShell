@@ -94,6 +94,7 @@ Function Start-SMBDeploymentGUI {
                     $SyncHash.ViewModel.ActiveTenant = $SelectedTenant
                     $SyncHash.ViewModel.Licenses = Get-O365License -TenantId $SelectedTenant.Id
                     $SyncHash.GUI.FindName('Txt_Customer').Text = $SelectedTenant.Name.Replace(".", "")
+
                     Add-AzureRmAccount -Credential $SyncHash.ViewModel.AzureCredential -TenantId $($SelectedTenant.Id)
                     write-log -Message "Getting subscriptions for Tenant $SelectedTenant" -type Debug
                     foreach ($Subscription in (Get-AzureRmSubscription -TenantId $SelectedTenant.Id)) {
