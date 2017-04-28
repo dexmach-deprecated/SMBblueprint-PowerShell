@@ -18,8 +18,8 @@ function Test-AzureResourceLocation {
         $ErrorString = "Error while checking Azure location compatibility: "
         try{
             $Resources = @()
-            $InvalidResources = new-object System.Collections.ArrayList<String>
-            $CompatibleResources = (Get-AzureRMLocation)|where{$_.Location -eq $Location}
+            $InvalidResources = new-object System.Collections.ArrayList
+            $CompatibleResources = (Get-AzureRMLocation)
             write-verbose "Found Location: $CompatibleResources"
             if(!$Location){
                 throw "Invalid Azure location provided"
@@ -37,7 +37,7 @@ function Test-AzureResourceLocation {
                     }
                 }
             }
-            $Resources = $Resources|select -Unique
+            $Resources = $Resources|Select-Object -Unique
         }
         catch{
             throw "$($ErrorString): $_"
@@ -47,10 +47,14 @@ function Test-AzureResourceLocation {
     process {
         try{
             foreach($Resource in $Resources){
-                if($CompatibleResources.Providers -contains $Resource){
+                if($($CompatibleResources|Where-Object{$_.Location -eq $Location}).Providers -contains $Resource){
                     write-verbose "$Resource OK"
                 } else {
-                    $InvalidResources.Add($Resource)
+                    $hash = @{
+                        Resource = $Resource
+                        AvailableLocations = $($CompatibleResources|Where-Object{$_.Providers -contains $Resource})|Select-Object -ExpandProperty Location
+                    }
+                    $null = $InvalidResources.Add($hash)
                     write-verbose "$Resource NOK"
                 }
             }

@@ -14,20 +14,22 @@ It uses a set of given deployment parameters to start and monitor the ARM-based 
 
 ### AzureTenantDomain (Default)
 ```
-New-SMBAzureDeployment -Location <String> [-FallbackLocation <String>] [-AsJob] -CustomerName <String>
- -CustomerSize <String> [-AdditionalVMSize <String>] [-AdditionalSQLInstanceSize <String>] [-Backup <String>]
- [-VPN <String>] [-Management <String>] [-OS <String>] [-SysAdminPassword <String>] -Credential <PSCredential>
- -TenantDomain <String> [-SubscriptionId <String>] [-SubscriptionName <String>] [-ResourceGroupPrefix <String>]
- [-NoUpdateCheck] [-StorageType <String>] [-Log <String>] [<CommonParameters>]
+New-SMBAzureDeployment -Location <String> [-AutomationLocation <String>] [-LogAnalyticsLocation <String>]
+ [-AsJob] -CustomerName <String> -CustomerSize <String> [-AdditionalVMSize <String>]
+ [-AdditionalSQLInstanceSize <String>] [-Backup <String>] [-VPN <String>] [-Management <String>] [-OS <String>]
+ [-SysAdminPassword <String>] -Credential <PSCredential> -TenantDomain <String> [-SubscriptionId <String>]
+ [-SubscriptionName <String>] [-ResourceGroupPrefix <String>] [-NoUpdateCheck] [-StorageType <String>]
+ [-InstanceId <String>] [<CommonParameters>]
 ```
 
 ### AzureTenantId
 ```
-New-SMBAzureDeployment -Location <String> [-FallbackLocation <String>] [-AsJob] -CustomerName <String>
- -CustomerSize <String> [-AdditionalVMSize <String>] [-AdditionalSQLInstanceSize <String>] [-Backup <String>]
- [-VPN <String>] [-Management <String>] [-OS <String>] [-SysAdminPassword <String>] -Credential <PSCredential>
- -TenantId <String> [-SubscriptionId <String>] [-SubscriptionName <String>] [-ResourceGroupPrefix <String>]
- [-NoUpdateCheck] [-StorageType <String>] [-Log <String>] [<CommonParameters>]
+New-SMBAzureDeployment -Location <String> [-AutomationLocation <String>] [-LogAnalyticsLocation <String>]
+ [-AsJob] -CustomerName <String> -CustomerSize <String> [-AdditionalVMSize <String>]
+ [-AdditionalSQLInstanceSize <String>] [-Backup <String>] [-VPN <String>] [-Management <String>] [-OS <String>]
+ [-SysAdminPassword <String>] -Credential <PSCredential> -TenantId <String> [-SubscriptionId <String>]
+ [-SubscriptionName <String>] [-ResourceGroupPrefix <String>] [-NoUpdateCheck] [-StorageType <String>]
+ [-InstanceId <String>] [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -168,21 +170,6 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -Log
-This parameter is for internal use. To prevent a new logfile from being created when running in GUI-mode, the existing log-file to use is passed.
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases: 
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
 ### -ResourceGroupPrefix
 The naming prefix to use for the Azure resource group to be created.
 
@@ -294,28 +281,6 @@ Accept pipeline input: False
 Accept wildcard characters: False
 ```
 
-### -FallbackLocation
-The location to use for the monitoring- and automation services in case the primary region does not support them.
-The supported fallback locations are:
-* westeurope
-* southeastasia
-* australiasoutheast
-
-When this parameter is omitted and the primary region is not supported, you will be prompted to choose one of the locations, or cancel the deployment.
-
-```yaml
-Type: String
-Parameter Sets: (All)
-Aliases: 
-Accepted values: westeurope, southeastasia, australiasoutheast
-
-Required: False
-Position: Named
-Default value: None
-Accept pipeline input: False
-Accept wildcard characters: False
-```
-
 ### -Location
 The Azure location where the solution should be deployed. Some locations impose limits in regards to the backup, automation and monitoring capabilities. Check the 'Backup' and 'FallbackLocation' parameters for more information.
 
@@ -383,8 +348,53 @@ Specifies the storage type to use for the virtual machines that are deployed
 ```yaml
 Type: String
 Parameter Sets: (All)
-Aliases:
-Accepted Values: Standard_LRS, Standard_ZRS, Standard_GRS, Standard_RAGRS, Premium_LRS
+Aliases: 
+Accepted values: Standard_LRS, Standard_ZRS, Standard_GRS, Standard_RAGRS, Premium_LRS
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -AutomationLocation
+The location to use for the automation resources. If omitted, the primary location will be checked for availability of the resource type. If it is available, the primary location is used. If not, you will be prompted with a list of available locations to choose from.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases: 
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -InstanceId
+{{Fill InstanceId Description}}
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases: 
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -LogAnalyticsLocation
+The location to use for the log analytics resources. If omitted, the primary location will be checked for availability of the resource type. If it is available, the primary location is used. If not, you will be prompted with a list of available locations to choose from.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases: 
 
 Required: False
 Position: Named

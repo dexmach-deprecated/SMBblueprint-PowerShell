@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<helpItems schema="maml">
+<helpItems xmlns="http://msh" schema="maml">
 
 <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
 <command:details><command:name>New-SMBAzureDeployment</command:name>
@@ -91,15 +91,6 @@
 <maml:uri /></dev:type>
 <dev:defaultValue>None</dev:defaultValue>
 </command:parameter>
-<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>Log</maml:name>
-<maml:Description><maml:para>This parameter is for internal use. To prevent a new logfile from being created when running in GUI-mode, the existing log-file to use is passed.
-</maml:para>
-</maml:Description>
-<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-<dev:type><maml:name>String</maml:name>
-<maml:uri /></dev:type>
-<dev:defaultValue>None</dev:defaultValue>
-</command:parameter>
 <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>ResourceGroupPrefix</maml:name>
 <maml:Description><maml:para>The naming prefix to use for the Azure resource group to be created.
 </maml:para>
@@ -157,27 +148,6 @@
 <maml:uri /></dev:type>
 <dev:defaultValue>None</dev:defaultValue>
 </command:parameter>
-<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>FallbackLocation</maml:name>
-<maml:Description><maml:para>The location to use for the monitoring- and automation services in case the primary region does not support them. The supported fallback locations are: * westeurope
-</maml:para>
-<maml:para>* southeastasia
-</maml:para>
-<maml:para>* australiasoutheast
-</maml:para>
-<maml:para>
-</maml:para>
-<maml:para>When this parameter is omitted and the primary region is not supported, you will be prompted to choose one of the locations, or cancel the deployment.
-</maml:para>
-</maml:Description>
-<command:parameterValueGroup><command:parameterValue required="false" variableLength="false">westeurope</command:parameterValue>
-<command:parameterValue required="false" variableLength="false">southeastasia</command:parameterValue>
-<command:parameterValue required="false" variableLength="false">australiasoutheast</command:parameterValue>
-</command:parameterValueGroup>
-<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-<dev:type><maml:name>String</maml:name>
-<maml:uri /></dev:type>
-<dev:defaultValue>None</dev:defaultValue>
-</command:parameter>
 <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>Location</maml:name>
 <maml:Description><maml:para>The Azure location where the solution should be deployed. Some locations impose limits in regards to the backup, automation and monitoring capabilities. Check the 'Backup' and 'FallbackLocation' parameters for more information.
 </maml:para>
@@ -226,6 +196,33 @@
 <command:parameterValue required="false" variableLength="false">Standard_RAGRS</command:parameterValue>
 <command:parameterValue required="false" variableLength="false">Premium_LRS</command:parameterValue>
 </command:parameterValueGroup>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>AutomationLocation</maml:name>
+<maml:Description><maml:para>The location to use for the automation resources. If omitted, the primary location will be checked for availability of the resource type. If it is available, the primary location is used. If not, you will be prompted with a list of available locations to choose from.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>InstanceId</maml:name>
+<maml:Description><maml:para>{{Fill InstanceId Description}}
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>LogAnalyticsLocation</maml:name>
+<maml:Description><maml:para>The location to use for the log analytics resources. If omitted, the primary location will be checked for availability of the resource type. If it is available, the primary location is used. If not, you will be prompted with a list of available locations to choose from.
+</maml:para>
+</maml:Description>
 <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 <dev:type><maml:name>String</maml:name>
 <maml:uri /></dev:type>
@@ -309,15 +306,6 @@
 <maml:uri /></dev:type>
 <dev:defaultValue>None</dev:defaultValue>
 </command:parameter>
-<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>Log</maml:name>
-<maml:Description><maml:para>This parameter is for internal use. To prevent a new logfile from being created when running in GUI-mode, the existing log-file to use is passed.
-</maml:para>
-</maml:Description>
-<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-<dev:type><maml:name>String</maml:name>
-<maml:uri /></dev:type>
-<dev:defaultValue>None</dev:defaultValue>
-</command:parameter>
 <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>ResourceGroupPrefix</maml:name>
 <maml:Description><maml:para>The naming prefix to use for the Azure resource group to be created.
 </maml:para>
@@ -375,27 +363,6 @@
 <maml:uri /></dev:type>
 <dev:defaultValue>None</dev:defaultValue>
 </command:parameter>
-<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>FallbackLocation</maml:name>
-<maml:Description><maml:para>The location to use for the monitoring- and automation services in case the primary region does not support them. The supported fallback locations are: * westeurope
-</maml:para>
-<maml:para>* southeastasia
-</maml:para>
-<maml:para>* australiasoutheast
-</maml:para>
-<maml:para>
-</maml:para>
-<maml:para>When this parameter is omitted and the primary region is not supported, you will be prompted to choose one of the locations, or cancel the deployment.
-</maml:para>
-</maml:Description>
-<command:parameterValueGroup><command:parameterValue required="false" variableLength="false">westeurope</command:parameterValue>
-<command:parameterValue required="false" variableLength="false">southeastasia</command:parameterValue>
-<command:parameterValue required="false" variableLength="false">australiasoutheast</command:parameterValue>
-</command:parameterValueGroup>
-<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-<dev:type><maml:name>String</maml:name>
-<maml:uri /></dev:type>
-<dev:defaultValue>None</dev:defaultValue>
-</command:parameter>
 <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>Location</maml:name>
 <maml:Description><maml:para>The Azure location where the solution should be deployed. Some locations impose limits in regards to the backup, automation and monitoring capabilities. Check the 'Backup' and 'FallbackLocation' parameters for more information.
 </maml:para>
@@ -444,6 +411,33 @@
 <command:parameterValue required="false" variableLength="false">Standard_RAGRS</command:parameterValue>
 <command:parameterValue required="false" variableLength="false">Premium_LRS</command:parameterValue>
 </command:parameterValueGroup>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>AutomationLocation</maml:name>
+<maml:Description><maml:para>The location to use for the automation resources. If omitted, the primary location will be checked for availability of the resource type. If it is available, the primary location is used. If not, you will be prompted with a list of available locations to choose from.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>InstanceId</maml:name>
+<maml:Description><maml:para>{{Fill InstanceId Description}}
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>LogAnalyticsLocation</maml:name>
+<maml:Description><maml:para>The location to use for the log analytics resources. If omitted, the primary location will be checked for availability of the resource type. If it is available, the primary location is used. If not, you will be prompted with a list of available locations to choose from.
+</maml:para>
+</maml:Description>
 <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
 <dev:type><maml:name>String</maml:name>
 <maml:uri /></dev:type>
@@ -514,15 +508,6 @@
 <maml:uri /></dev:type>
 <dev:defaultValue>None</dev:defaultValue>
 </command:parameter>
-<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>Log</maml:name>
-<maml:Description><maml:para>This parameter is for internal use. To prevent a new logfile from being created when running in GUI-mode, the existing log-file to use is passed.
-</maml:para>
-</maml:Description>
-<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-<dev:type><maml:name>String</maml:name>
-<maml:uri /></dev:type>
-<dev:defaultValue>None</dev:defaultValue>
-</command:parameter>
 <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>ResourceGroupPrefix</maml:name>
 <maml:Description><maml:para>The naming prefix to use for the Azure resource group to be created.
 </maml:para>
@@ -586,23 +571,6 @@
 <maml:uri /></dev:type>
 <dev:defaultValue>None</dev:defaultValue>
 </command:parameter>
-<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>FallbackLocation</maml:name>
-<maml:Description><maml:para>The location to use for the monitoring- and automation services in case the primary region does not support them. The supported fallback locations are: * westeurope
-</maml:para>
-<maml:para>* southeastasia
-</maml:para>
-<maml:para>* australiasoutheast
-</maml:para>
-<maml:para>
-</maml:para>
-<maml:para>When this parameter is omitted and the primary region is not supported, you will be prompted to choose one of the locations, or cancel the deployment.
-</maml:para>
-</maml:Description>
-<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
-<dev:type><maml:name>String</maml:name>
-<maml:uri /></dev:type>
-<dev:defaultValue>None</dev:defaultValue>
-</command:parameter>
 <command:parameter required="true" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>Location</maml:name>
 <maml:Description><maml:para>The Azure location where the solution should be deployed. Some locations impose limits in regards to the backup, automation and monitoring capabilities. Check the 'Backup' and 'FallbackLocation' parameters for more information.
 </maml:para>
@@ -641,6 +609,33 @@
 </command:parameter>
 <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>StorageType</maml:name>
 <maml:Description><maml:para>Specifies the storage type to use for the virtual machines that are deployed
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>AutomationLocation</maml:name>
+<maml:Description><maml:para>The location to use for the automation resources. If omitted, the primary location will be checked for availability of the resource type. If it is available, the primary location is used. If not, you will be prompted with a list of available locations to choose from.
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>InstanceId</maml:name>
+<maml:Description><maml:para>{{Fill InstanceId Description}}
+</maml:para>
+</maml:Description>
+<command:parameterValue required="true" variableLength="false">String</command:parameterValue>
+<dev:type><maml:name>String</maml:name>
+<maml:uri /></dev:type>
+<dev:defaultValue>None</dev:defaultValue>
+</command:parameter>
+<command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none"><maml:name>LogAnalyticsLocation</maml:name>
+<maml:Description><maml:para>The location to use for the log analytics resources. If omitted, the primary location will be checked for availability of the resource type. If it is available, the primary location is used. If not, you will be prompted with a list of available locations to choose from.
 </maml:para>
 </maml:Description>
 <command:parameterValue required="true" variableLength="false">String</command:parameterValue>

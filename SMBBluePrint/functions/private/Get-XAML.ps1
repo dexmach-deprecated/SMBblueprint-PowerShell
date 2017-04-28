@@ -6,7 +6,7 @@ function Get-XAML {
     $xaml = @{
 
     GUI = @"
-<Window 
+<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -17,6 +17,9 @@ function Get-XAML {
             <Setter Property="HorizontalAlignment" Value="Left" />
             <Setter Property="VerticalAlignment" Value="Top" />
             <Setter Property="Margin" Value="10" />
+        </Style>
+        <Style TargetType="{x:Type TextBlock}" x:Key="WrapText">
+            <Setter Property="TextWrapping" Value="Wrap"/>
         </Style>
     </Window.Resources>
     <Grid Height="Auto">
@@ -59,15 +62,17 @@ function Get-XAML {
                 <ColumnDefinition Name="HeaderRight" />
             </Grid.ColumnDefinitions>
 
-            <StackPanel Grid.Column="0">
-                <Image Name="AzureLogo" Source="D:\OneDrive - Inovativ\Projects\Microsoft\SBS\dev\GUI\src\azure.png" Stretch="Fill" HorizontalAlignment="Left" Width="150" Height="50"  />
-                <TextBlock FontSize="20">SMB Blueprint</TextBlock>
+            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                <Image Name="AzureLogo" Source="D:\OneDrive - Inovativ\Projects\Microsoft\SBS\dev\GUI\src\azure.png" Stretch="Fill" HorizontalAlignment="Left" Width="100" Height="30"  />
+                <TextBlock FontSize="20" VerticalAlignment="Center" Margin="10,0,0,0">SMB Blueprint</TextBlock>
             </StackPanel>
-            <StackPanel Grid.Column="1" VerticalAlignment="Bottom">
-                <Image Name="MicrosoftLogo" Source="D:\OneDrive - Inovativ\Projects\Microsoft\SBS\dev\GUI\src\microsoft.png" VerticalAlignment="Stretch" HorizontalAlignment="Right" Height="50" Width="300"  />
+            <StackPanel Grid.Column="1" VerticalAlignment="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
+
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center">Powered By</TextBlock>
-                    <Image Name="InovativLogo" Source="D:\OneDrive - Inovativ\Projects\Microsoft\SBS\dev\GUI\src\inovativ.png" Height="20" Width="90" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center">Powered By</TextBlock>
+                    <Image Name="MicrosoftLogo" Source="D:\OneDrive - Inovativ\Projects\Microsoft\SBS\dev\GUI\src\microsoft.png" VerticalAlignment="Stretch" HorizontalAlignment="Center" Height="40" Width="100" Margin="0"  />
+                    <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Margin="0,5,15,5" />
+                    <Image Name="InovativLogo" Source="D:\OneDrive - Inovativ\Projects\Microsoft\SBS\dev\GUI\src\inovativ.png" Height="40" Width="100" HorizontalAlignment="Center" VerticalAlignment="Stretch" Margin="0" />
 
                 </StackPanel>
 
@@ -209,7 +214,7 @@ function Get-XAML {
 
                                 </StackPanel>
                                 <StackPanel Orientation="Vertical" Margin="0,0,0,0">
-                                    <DataGrid Name="GroupGrid" ItemsSource="{Binding Path=DataContext.Groups,RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}" 
+                                    <DataGrid Name="GroupGrid" ItemsSource="{Binding Path=DataContext.Groups,RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"
                                       IsReadOnly="False" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" VerticalAlignment="Top"
                                   HorizontalAlignment="Stretch" Height="150" Width="800" >
                                         <DataGrid.Resources>
@@ -307,7 +312,7 @@ function Get-XAML {
                                     <RowDefinition Height="Auto" />
                                     <!--    <RowDefinition Height="Auto" /> -->
                                 </Grid.RowDefinitions>
-                                <DataGrid Grid.Column="0" Grid.Row="0" Name="UserGrid" ItemsSource="{Binding Path=Users,UpdateSourceTrigger=PropertyChanged,Mode=OneWay}" 
+                                <DataGrid Grid.Column="0" Grid.Row="0" Name="UserGrid" ItemsSource="{Binding Path=Users,UpdateSourceTrigger=PropertyChanged,Mode=OneWay}"
                                       IsReadOnly="True" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
                                        Width="800" Height="360">
                                     <DataGrid.Columns>
@@ -453,33 +458,13 @@ function Get-XAML {
                         </GroupBox>
                         <GroupBox Grid.Row="1" Header="4. Location">
                             <StackPanel HorizontalAlignment="Stretch">
-                                <Label VerticalAlignment="Center" HorizontalAlignment="Center">Location</Label>
+                                <Label VerticalAlignment="Center" HorizontalAlignment="Center">Primary Location</Label>
                                 <ComboBox Name="Cmb_PrimaryLocation" Width="250" VerticalAlignment="Center" HorizontalAlignment="Center" />
-                                <StackPanel Name="Spl_ServiceUnavailable">
-                                    <Label VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="10,10,10,10" MinWidth="0" MaxWidth="300" >
-                                        <Label.Resources>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="TextWrapping" Value="Wrap" />
-                                            </Style>
 
-                                        </Label.Resources>
-                                        <Label.Background>
-                                            <SolidColorBrush Color="#FF0088FF" />
-                                        </Label.Background>
-                                        <Label.Foreground>
-                                            <SolidColorBrush Color="White" />
-                                        </Label.Foreground>
-                                        <TextBlock>WARNING: The monitoring, automation and recovery services are not available in this region.<LineBreak />
-                                    Please select a fallback action:</TextBlock>
-                                    </Label>
-                                    <ComboBox Name="Cmb_FallbackAction" Width="300" VerticalAlignment="Center" HorizontalAlignment="Center">
-                                        <!-- <ComboBoxItem Tag="none" IsSelected="True">Continue deployment without these services</ComboBoxItem> -->
-                                        <ComboBoxItem Tag="westeurope" IsSelected="True">Deploy impacted services to West-Europe</ComboBoxItem>
-                                        <ComboBoxItem Tag="southeastasia">Deploy impacted services to SouthEast-Asia</ComboBoxItem>
-                                        <ComboBoxItem Tag="australiasoutheast">Deploy impacted services to Australia-SouthEast</ComboBoxItem>
-
-                                    </ComboBox>
-                                </StackPanel>
+                                <Label VerticalAlignment="Center" HorizontalAlignment="Center">Automation Location</Label>
+                                <ComboBox Name="Cmb_AutomationLocation" Width="250" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                <Label VerticalAlignment="Center" HorizontalAlignment="Center">Log Analytics Location</Label>
+                                <ComboBox Name="Cmb_LogAnalyticsLocation" Width="250" VerticalAlignment="Center" HorizontalAlignment="Center" />
 
                             </StackPanel>
                         </GroupBox>
@@ -490,7 +475,7 @@ function Get-XAML {
                                 <TextBox VerticalAlignment="Center" Width="150" Name="Txt_AzurePasswordVisible"  Visibility="Collapsed" IsReadOnly="True"></TextBox>
                                 <Button Name="Btn_ShowAzurePassword" Margin="0" VerticalAlignment="Center">Show</Button>
                                 <Label VerticalAlignment="Center" Margin="20,0,0,0">Customer Name:</Label>
-                                <TextBox VerticalAlignment="Center" Name="Txt_Customer" Width="100" />
+                                <TextBox VerticalAlignment="Center" Name="Txt_Customer" Width="100" MaxLength="15" />
                                 <Button Name="btn_Deploy" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="Bold"   Background="#FF24BE43">Provision Azure</Button>
                             </StackPanel>
                         </GroupBox>
@@ -543,7 +528,7 @@ function Get-XAML {
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="Severity" Binding="{Binding Path=Severity}" />
                                         <DataGridTextColumn Header="Component" Binding="{Binding Path=Component}" />
-                                        <DataGridTextColumn Header="Message" Binding="{Binding Path=Message}" />
+                                        <DataGridTextColumn Header="Message" Binding="{Binding Path=Message}" MaxWidth="500" ElementStyle="{StaticResource WrapText}" />
                                         <DataGridTextColumn Header="Timestamp" Binding="{Binding Path=Timestamp}" />
                                     </DataGrid.Columns>
                                 </DataGrid>
